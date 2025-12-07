@@ -14,7 +14,7 @@
 | Database | PostgreSQL | ACID compliance, JSONB for flexible data |
 | Cache | Redis | Pub/Sub for real-time, session management |
 | Real-time | WebSockets | Bi-directional communication for live updates |
-| Auth | JWT + OAuth2 | Google/Facebook social login support |
+| Auth | Firebase Authentication | Managed auth, social login out-of-the-box |
 | i18n | svelte-i18n (FE) + JSONB (BE) | Multi-language support |
 
 ---
@@ -46,7 +46,7 @@
 |  |                     GO MONOLITH SERVER                                |   |
 |  |  +--------------+ +--------------+ +--------------+ +--------------+  |   |
 |  |  |   REST API   | |  WebSocket   | | Game Engine  | |    Auth      |  |   |
-|  |  |   Handler    | |   Handler    | |   (Tick)     | |   Service    |  |   |
+|  |  |   Handler    | |   Handler    | |   (Tick)     | | (Firebase)   |  |   |
 |  |  +--------------+ +--------------+ +--------------+ +--------------+  |   |
 |  |  +--------------+ +--------------+ +--------------+ +--------------+  |   |
 |  |  |   Village    | |   Combat     | |  Alliance    | |   Market     |  |   |
@@ -549,6 +549,12 @@ CREATE INDEX idx_sessions_user ON sessions(user_id);
 | POST | `/api/v1/auth/oauth/{provider}` | OAuth login (google/facebook) |
 | POST | `/api/v1/auth/refresh` | Refresh JWT token |
 | POST | `/api/v1/auth/logout` | Logout (invalidate token) |
+### 3.1 Authentication APIs (Firebase)
+ 
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/v1/auth/verify` | Verify Firebase ID Token & Create Session/User |
+| POST | `/api/v1/auth/logout` | Logout (invalidate session) |
 | GET | `/api/v1/auth/me` | Get current user info |
 
 ### 3.2 Server & Player APIs
@@ -708,7 +714,7 @@ backend/
 |   |   |-- shop.go              # Shop handlers
 |   |   +-- websocket.go         # WebSocket handlers
 |   |-- service/
-|   |   |-- auth_service.go      # Auth business logic
+|   |   |-- firebase_service.go  # Firebase Auth integration
 |   |   |-- player_service.go    # Player logic
 |   |   |-- village_service.go   # Village logic
 |   |   |-- building_service.go  # Building logic
@@ -755,8 +761,8 @@ backend/
 |       |-- database/
 |       |   |-- postgres.go      # PostgreSQL connection
 |       |   +-- redis.go         # Redis connection
-|       |-- auth/
-|       |   |-- jwt.go           # JWT utilities
+|       |-- firebase/
+|       |   +-- client.go        # Firebase Admin SDK init
 |       |   +-- oauth.go         # OAuth helpers
 |       |-- validator/
 |       |   +-- validator.go     # Request validation
@@ -890,7 +896,7 @@ frontend/
 | Cache | go-redis | Redis client |
 | WebSocket | gorilla/websocket | WebSocket handling |
 | JWT | golang-jwt/jwt | JWT auth |
-| OAuth | golang/oauth2 | Social login |
+| Auth | firebase.google.com/go/v4 | Firebase Admin SDK |
 | Validation | go-playground/validator | Request validation |
 | Migration | golang-migrate | DB migrations |
 | Logging | zerolog / zap | Structured logging |
@@ -951,7 +957,10 @@ frontend/
 |  2. JWT Authentication                                            |
 |     +-> Short-lived access tokens (15 min)                        |
 |     +-> Long-lived refresh tokens (7 days)                        |
-|     +-> Token rotation on refresh                                 |
+|  2. Firebase Authentication                                       |
+|     +-> Client logs in via Firebase SDK (Email/Google/Facebook)   |
+|     +-> Sends ID Token to Backend in Authorization header         |
+|     +-> Backend verifies ID Token via Firebase Admin SDK          |
 |                                                                   |
 |  3. Rate Limiting                                                 |
 |     +-> API: 100 req/min per IP                                   |

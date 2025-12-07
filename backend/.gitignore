@@ -1,0 +1,30 @@
+# Binaries
+/bin/
+/server
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Service Account & Secrets
+serviceAccountKey.json
+*.pem
+*.key
+
+# Environment Files
+.env
+.env.local
+.env.*.local
+
+# IDEs
+.idea
+.vscode
+.DS_Store
+
+# Test output
+coverage.out
+profile.out
+
+# Vendor
+vendor/

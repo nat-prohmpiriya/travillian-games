@@ -16,45 +16,45 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-# Phase 1: Foundation & Infrastructure
+# [x] Phase 1: Foundation & Infrastructure
 
-## 1.1 Project Setup
+## [x] 1.1 Project Setup
 
-### T001: Initialize Go Backend Project
+### [x] T001: Initialize Go Backend Project
 - **Description:** Create Go module with standard project structure following the backend layout in 02-pland.md. Initialize go.mod, create folder structure, and add base files.
 - **Technical Context:**
   - Files: `backend/go.mod`, `backend/cmd/server/main.go`
   - Folders: `internal/config`, `internal/server`, `internal/handler`, `internal/service`, `internal/repository`, `internal/model`, `internal/game`, `internal/realtime`, `internal/pkg`
 - **Acceptance Criteria:**
-  - [ ] `go mod init` successful with module name `github.com/travillian/tusk-horn`
-  - [ ] All folder structure created as per 02-pland.md Section 4.1
-  - [ ] `go build ./...` runs without errors
-  - [ ] Main.go prints "Tusk & Horn Server Starting..."
+  - [x] `go mod init` successful with module name `github.com/travillian/tusk-horn`
+  - [x] All folder structure created as per 02-pland.md Section 4.1
+  - [x] `go build ./...` runs without errors
+  - [x] Main.go prints "Tusk & Horn Server Starting..."
 
 ---
 
-### T002: Initialize SvelteKit Frontend Project
+### [x] T002: Initialize SvelteKit Frontend Project
 - **Description:** Create SvelteKit project with TypeScript, Tailwind CSS, and svelte-i18n. Set up base folder structure.
 - **Technical Context:**
   - Command: `npm create svelte@latest frontend`
   - Files: `frontend/svelte.config.js`, `frontend/tailwind.config.js`
   - Folders: Follow structure in 02-pland.md Section 4.2
 - **Acceptance Criteria:**
-  - [ ] SvelteKit project created with TypeScript template
-  - [ ] Tailwind CSS configured and working
-  - [ ] svelte-i18n installed with th/en locales
+  - [x] SvelteKit project created with TypeScript template
+  - [x] Tailwind CSS configured and working
+  - [x] svelte-i18n installed with th/en locales
   - [ ] `npm run dev` starts development server
-  - [ ] Base folder structure matches 02-pland.md
+  - [x] Base folder structure matches 02-pland.md
 
 ---
 
-### T003: Setup Docker Compose for Local Development
+### [x] T003: Setup Docker Compose for Local Development
 - **Description:** Create docker-compose.yml with PostgreSQL, Redis, and optional Adminer for database management.
 - **Technical Context:**
   - Files: `docker-compose.yml`, `.env.example`
   - Services: postgres:15, redis:7, adminer
 - **Acceptance Criteria:**
-  - [ ] `docker-compose up -d` starts all services
+  - [x] `docker-compose up -d` starts all services
   - [ ] PostgreSQL accessible at localhost:5432
   - [ ] Redis accessible at localhost:6379
   - [ ] Adminer accessible at localhost:8081
@@ -62,21 +62,21 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T004: Setup Configuration Management (Go)
+### [x] T004: Setup Configuration Management (Go)
 - **Description:** Implement configuration loading using Viper. Support environment variables and config files.
 - **Technical Context:**
   - Files: `internal/config/config.go`
   - Dependency: `github.com/spf13/viper`
 - **Acceptance Criteria:**
-  - [ ] Config struct with Database, Redis, Server, JWT sections
-  - [ ] Loads from environment variables (DB_HOST, REDIS_URL, etc.)
-  - [ ] Loads from config.yaml if present
-  - [ ] Validates required fields on startup
-  - [ ] Unit test for config loading
+  - [x] Config struct with Database, Redis, Server, JWT sections
+  - [x] Loads from environment variables (DB_HOST, REDIS_URL, etc.)
+  - [x] Loads from config.yaml if present
+  - [x] Validates required fields on startup
+  - [x] Unit test for config loading
 
 ---
 
-### T005: Setup PostgreSQL Connection Pool
+### [] T005: Setup PostgreSQL Connection Pool
 - **Description:** Create database connection pool using pgx. Implement connection health check.
 - **Technical Context:**
   - Files: `internal/pkg/database/postgres.go`
@@ -90,7 +90,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T006: Setup Redis Connection
+### [] T006: Setup Redis Connection
 - **Description:** Create Redis client wrapper for caching and pub/sub.
 - **Technical Context:**
   - Files: `internal/pkg/database/redis.go`
@@ -104,7 +104,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T007: Setup Database Migrations
+### [] T007: Setup Database Migrations
 - **Description:** Create migration system using golang-migrate. Add first migration for extensions.
 - **Technical Context:**
   - Files: `migrations/001_init.up.sql`, `migrations/001_init.down.sql`, `scripts/migrate.go`
@@ -117,21 +117,21 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T008: Setup HTTP Server with Chi Router
+### [x] T008: Setup HTTP Server with Chi Router
 - **Description:** Create HTTP server with Chi router, graceful shutdown, and base middleware.
 - **Technical Context:**
   - Files: `internal/server/server.go`, `internal/server/routes.go`
   - Dependency: `github.com/go-chi/chi/v5`
 - **Acceptance Criteria:**
-  - [ ] Server starts on configured port
-  - [ ] Graceful shutdown on SIGTERM/SIGINT
-  - [ ] Health check endpoint: GET /health returns 200
+  - [x] Server starts on configured port
+  - [x] Graceful shutdown on SIGTERM/SIGINT
+  - [x] Health check endpoint: GET /health returns 200
   - [ ] Request logging middleware
-  - [ ] Recovery middleware for panics
+  - [x] Recovery middleware for panics
 
 ---
 
-### T009: Setup CORS Middleware
+### [] T009: Setup CORS Middleware
 - **Description:** Implement CORS middleware with configurable allowed origins.
 - **Technical Context:**
   - Files: `internal/server/middleware/cors.go`
@@ -144,7 +144,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T010: Setup Request Validation
+### [] T010: Setup Request Validation
 - **Description:** Create request validation using go-playground/validator with custom error messages.
 - **Technical Context:**
   - Files: `internal/pkg/validator/validator.go`
@@ -157,7 +157,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T011: Setup Structured Logging
+### [] T011: Setup Structured Logging
 - **Description:** Implement structured logging with zerolog. Log levels and JSON format.
 - **Technical Context:**
   - Files: `internal/pkg/logger/logger.go`
@@ -171,7 +171,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T012: Setup Frontend API Client
+### [] T012: Setup Frontend API Client
 - **Description:** Create API client service for frontend using fetch with interceptors.
 - **Technical Context:**
   - Files: `frontend/src/lib/services/api.ts`
@@ -185,7 +185,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T013: Setup Frontend WebSocket Client
+### [] T013: Setup Frontend WebSocket Client
 - **Description:** Create WebSocket service for real-time updates.
 - **Technical Context:**
   - Files: `frontend/src/lib/services/websocket.ts`
@@ -199,17 +199,17 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T014: Create Makefile for Common Commands
+### [x] T014: Create Makefile for Common Commands
 - **Description:** Create Makefile with common development commands.
 - **Technical Context:**
   - Files: `Makefile`
 - **Acceptance Criteria:**
-  - [ ] `make dev` - start backend dev server
-  - [ ] `make test` - run all tests
-  - [ ] `make lint` - run linters
+  - [x] `make dev` - start backend dev server
+  - [x] `make test` - run all tests
+  - [x] `make lint` - run linters
   - [ ] `make migrate-up` - run migrations
-  - [ ] `make build` - build production binary
-  - [ ] `make docker-up` - start docker services
+  - [x] `make build` - build production binary
+  - [x] `make docker-up` - start docker services
 
 ---
 
@@ -217,7 +217,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ## 1.2 Core Tables
 
-### T015: Create Users Table Migration
+### [] T015: Create Users Table Migration
 - **Description:** Create migration for users table with email, password, OAuth fields.
 - **Technical Context:**
   - Files: `migrations/002_users.up.sql`, `migrations/002_users.down.sql`
@@ -231,7 +231,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T016: Create Servers Table Migration
+### [] T016: Create Servers Table Migration
 - **Description:** Create migration for game servers (worlds).
 - **Technical Context:**
   - Files: `migrations/003_servers.up.sql`
@@ -244,7 +244,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T017: Create Tribes Table Migration
+### [] T017: Create Tribes Table Migration
 - **Description:** Create migration for tribes reference table.
 - **Technical Context:**
   - Files: `migrations/004_tribes.up.sql`
@@ -257,7 +257,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T018: Create Players Table Migration
+### [] T018: Create Players Table Migration
 - **Description:** Create migration for players (user in a server).
 - **Technical Context:**
   - Files: `migrations/005_players.up.sql`
@@ -271,7 +271,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T019: Create Villages Table Migration
+### [] T019: Create Villages Table Migration
 - **Description:** Create migration for villages with resources.
 - **Technical Context:**
   - Files: `migrations/006_villages.up.sql`
@@ -284,7 +284,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T020: Create Buildings Table Migration
+### [] T020: Create Buildings Table Migration
 - **Description:** Create migration for buildings and building queue.
 - **Technical Context:**
   - Files: `migrations/007_buildings.up.sql`
@@ -298,7 +298,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T021: Create Troops Tables Migration
+### [] T021: Create Troops Tables Migration
 - **Description:** Create migration for troop definitions, troops, and training queue.
 - **Technical Context:**
   - Files: `migrations/008_troops.up.sql`
@@ -312,7 +312,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T022: Create Armies Table Migration
+### [] T022: Create Armies Table Migration
 - **Description:** Create migration for moving armies.
 - **Technical Context:**
   - Files: `migrations/009_armies.up.sql`
@@ -325,7 +325,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T023: Create Alliances Tables Migration
+### [] T023: Create Alliances Tables Migration
 - **Description:** Create migration for alliances, members, and diplomacy.
 - **Technical Context:**
   - Files: `migrations/010_alliances.up.sql`
@@ -339,7 +339,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T024: Create Reports Table Migration
+### [] T024: Create Reports Table Migration
 - **Description:** Create migration for player reports (battle, trade, scout).
 - **Technical Context:**
   - Files: `migrations/011_reports.up.sql`
@@ -352,7 +352,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T025: Create Messages Table Migration
+### [] T025: Create Messages Table Migration
 - **Description:** Create migration for private and alliance messages.
 - **Technical Context:**
   - Files: `migrations/012_messages.up.sql`
@@ -364,7 +364,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T026: Create Transactions Table Migration
+### [] T026: Create Transactions Table Migration
 - **Description:** Create migration for payment transactions.
 - **Technical Context:**
   - Files: `migrations/013_transactions.up.sql`
@@ -376,7 +376,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T027: Create Map Tiles Table Migration
+### [] T027: Create Map Tiles Table Migration
 - **Description:** Create migration for terrain data.
 - **Technical Context:**
   - Files: `migrations/014_map_tiles.up.sql`
@@ -388,7 +388,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T028: Create Sessions Table Migration
+### [] T028: Create Sessions Table Migration
 - **Description:** Create migration for session storage (optional, backup to Redis).
 - **Technical Context:**
   - Files: `migrations/015_sessions.up.sql`
@@ -399,7 +399,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T029: Seed Tribes Data
+### [] T029: Seed Tribes Data
 - **Description:** Create seed script to populate tribes table with 3 tribes.
 - **Technical Context:**
   - Files: `scripts/seed.go` or `migrations/016_seed_tribes.up.sql`
@@ -412,7 +412,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T030: Seed Troop Definitions Data
+### [] T030: Seed Troop Definitions Data
 - **Description:** Create seed script to populate troop_definitions with all 16 troops.
 - **Technical Context:**
   - Files: `migrations/017_seed_troops.up.sql`
@@ -429,176 +429,119 @@ Each task is small enough to be reviewed and tested independently.
 
 ## 1.3 Auth System
 
-### T031: Create User Model and Repository
-- **Description:** Implement User model and repository for database operations.
+# Phase 1: Authentication (Firebase)
+ 
+## 1.3 Auth System
+ 
+### T031: Setup Firebase Project & Admin SDK
+- **Description:** Initialize Firebase project and setup Admin SDK in Go backend.
+- **Technical Context:**
+  - Files: `internal/pkg/firebase/client.go`
+  - Dependency: `firebase.google.com/go/v4`
+  - Config: `GOOGLE_APPLICATION_CREDENTIALS` (Service Account JSON)
+- **Acceptance Criteria:**
+  - [x] Firebase Project created in Console
+  - [x] Service Account JSON added to local env (gitignored)
+  - [x] Firebase App initialized in backend
+  - [x] Verify ID Token method implemented
+  - [ ] Unit test with mock
+ 
+---
+ 
+### T032: Create User Model and Repository
+- **Description:** Implement User model linked to Firebase UID.
 - **Technical Context:**
   - Files: `internal/model/user.go`, `internal/repository/user_repo.go`
 - **Acceptance Criteria:**
-  - [ ] User struct with all fields
-  - [ ] Create, FindByEmail, FindByID, FindByOAuth methods
-  - [ ] Password hashing using bcrypt
-  - [ ] Unit tests with testcontainers
-
+  - [ ] User struct: id (UUID), firebase_uid (String), email, role
+  - [ ] CreateOrUpdateFromFirebase method (Upsert)
+  - [ ] FindByFirebaseUID method
+  - [ ] Unit tests
+ 
 ---
-
-### T032: Implement JWT Token Utilities
-- **Description:** Create JWT utilities for access and refresh tokens.
-- **Technical Context:**
-  - Files: `internal/pkg/auth/jwt.go`
-  - Dependency: `github.com/golang-jwt/jwt/v5`
-- **Acceptance Criteria:**
-  - [ ] GenerateAccessToken (15 min expiry)
-  - [ ] GenerateRefreshToken (7 days expiry)
-  - [ ] ValidateToken function
-  - [ ] Token claims: user_id, email, exp, iat
-  - [ ] Unit tests for token lifecycle
-
----
-
-### T033: Implement Auth Service
-- **Description:** Create auth service with register, login, refresh, logout logic.
-- **Technical Context:**
-  - Files: `internal/service/auth_service.go`
-- **Acceptance Criteria:**
-  - [ ] Register: validate, hash password, create user, return tokens
-  - [ ] Login: verify password, return tokens
-  - [ ] Refresh: validate refresh token, rotate tokens
-  - [ ] Logout: invalidate refresh token
-  - [ ] Unit tests for each flow
-
----
-
-### T034: Implement Auth Handlers
-- **Description:** Create HTTP handlers for auth endpoints.
-- **Technical Context:**
-  - Files: `internal/handler/auth.go`
-  - Endpoints: POST /auth/register, /auth/login, /auth/refresh, /auth/logout
-- **Acceptance Criteria:**
-  - [ ] Request validation for all endpoints
-  - [ ] Proper error responses (400, 401, 409)
-  - [ ] Return access_token, refresh_token, expires_in
-  - [ ] Set refresh token in HTTP-only cookie
-  - [ ] Integration tests
-
----
-
-### T035: Implement Auth Middleware
-- **Description:** Create JWT authentication middleware for protected routes.
+ 
+### T033: Implement Auth Middleware (Firebase)
+- **Description:** Create middleware to verify Firebase ID Token from Authorization header.
 - **Technical Context:**
   - Files: `internal/server/middleware/auth.go`
 - **Acceptance Criteria:**
-  - [ ] Extract token from Authorization header
-  - [ ] Validate token and extract claims
-  - [ ] Set user context for handlers
-  - [ ] Return 401 for invalid/expired tokens
-  - [ ] Unit tests
-
+  - [ ] Extract Bearer token
+  - [ ] Verify token with Firebase Admin SDK
+  - [ ] Extract UID and Claims
+  - [ ] Set user context in request
+  - [ ] Return 401 if invalid
+  - [ ] Rate limiting applied
+ 
 ---
-
-### T036: Implement Rate Limiting Middleware
-- **Description:** Create rate limiting middleware using Redis.
+ 
+### T034: Implement Auth Handlers
+- **Description:** Create handler to sync Firebase user to local DB (optional explicit sync or auto-sync via middleware).
 - **Technical Context:**
-  - Files: `internal/server/middleware/ratelimit.go`
-  - Limits: 100 req/min general, 5 req/15min for auth
+  - Files: `internal/handler/auth.go`
+  - Endpoints: POST /auth/login (Sync user data)
 - **Acceptance Criteria:**
-  - [ ] IP-based rate limiting
-  - [ ] Configurable limits per endpoint group
-  - [ ] X-RateLimit headers in response
-  - [ ] Return 429 when exceeded
-  - [ ] Redis-backed counter with TTL
-
+  - [ ] Receive ID Token (optional, mostly handled by middleware)
+  - [ ] Check if user exists in DB, if not create
+  - [ ] Return User Profile
+ 
 ---
-
-### T037: Implement OAuth Helpers (Google)
-- **Description:** Create OAuth flow helpers for Google login.
+ 
+### T035: Setup Firebase Client SDK (Frontend)
+- **Description:** Initialize Firebase App in SvelteKit frontend.
 - **Technical Context:**
-  - Files: `internal/pkg/auth/oauth.go`
-  - Dependency: `golang.org/x/oauth2/google`
+  - Files: `frontend/src/lib/firebase/config.ts`
+  - Env: `VITE_FIREBASE_API_KEY`, `VITE_FIREBASE_AUTH_DOMAIN`, etc.
 - **Acceptance Criteria:**
-  - [ ] Generate OAuth URL with state
-  - [ ] Exchange code for tokens
-  - [ ] Fetch user info from Google
-  - [ ] Handle errors gracefully
-  - [ ] Unit tests with mocks
-
+  - [x] Firebase config loaded from env
+  - [x] Firebase App initialized
+  - [x] Auth instance exported
+ 
 ---
-
-### T038: Implement OAuth Handler (Google)
-- **Description:** Create handler for Google OAuth callback.
-- **Technical Context:**
-  - Files: `internal/handler/auth.go` (extend)
-  - Endpoints: GET /auth/oauth/google, GET /auth/oauth/google/callback
-- **Acceptance Criteria:**
-  - [ ] Redirect to Google OAuth URL
-  - [ ] Handle callback, exchange code
-  - [ ] Create or link user account
-  - [ ] Return tokens after successful auth
-  - [ ] Error handling for denied/failed OAuth
-
----
-
-### T039: Create Frontend Auth Store
-- **Description:** Create Svelte store for authentication state.
+ 
+### T036: Create Frontend Auth Store (Firebase)
+- **Description:** Create Svelte store wrapping Firebase Auth state.
 - **Technical Context:**
   - Files: `frontend/src/lib/stores/auth.ts`
 - **Acceptance Criteria:**
-  - [ ] Stores user, accessToken, isAuthenticated
-  - [ ] login, logout, refreshToken methods
-  - [ ] Persist to localStorage
-  - [ ] Auto-refresh before token expiry
-  - [ ] TypeScript types for user
-
+  - [x] Listen to `onAuthStateChanged`
+  - [x] Store user object and ID Token
+  - [x] Handlers for loginWithGoogle, logout
+  - [x] Auto-refresh token logic (handled by SDK, but sync with store)
+ 
 ---
-
-### T040: Create Login Page
-- **Description:** Create login page with email/password and OAuth buttons.
+ 
+### T037: Create Login Page (Firebase)
+- **Description:** Create login page with Firebase UI/Logic.
 - **Technical Context:**
   - Files: `frontend/src/routes/auth/login/+page.svelte`
 - **Acceptance Criteria:**
-  - [ ] Email and password inputs with validation
-  - [ ] Login button with loading state
-  - [ ] Google/Facebook OAuth buttons
-  - [ ] Error message display
+  - [ ] Login with Google Button
+  - [ ] Email/Password Login Form (using `signInWithEmailAndPassword`)
+  - [ ] Error handling (wrong password, user not found)
   - [ ] Redirect to /game on success
-  - [ ] Link to registration page
-
+ 
 ---
-
-### T041: Create Registration Page
-- **Description:** Create registration page with email, password, confirm password.
+ 
+### T038: Create Registration Page (Firebase)
+- **Description:** Create registration page (Email/Password).
 - **Technical Context:**
   - Files: `frontend/src/routes/auth/register/+page.svelte`
 - **Acceptance Criteria:**
-  - [ ] Email, password, confirm password inputs
-  - [ ] Password strength indicator
-  - [ ] Form validation
-  - [ ] Success message and redirect to login
-  - [ ] Error handling for existing email
-
+  - [ ] Register Form (using `createUserWithEmailAndPassword`)
+  - [ ] Validate matching passwords
+  - [ ] Auto-login after register
+  - [ ] Create User record in Backend (call /auth/login or via trigger)
+ 
 ---
-
-### T042: Create OAuth Callback Page
-- **Description:** Create OAuth callback handler page.
-- **Technical Context:**
-  - Files: `frontend/src/routes/auth/callback/+page.svelte`
-- **Acceptance Criteria:**
-  - [ ] Extract code and state from URL
-  - [ ] Call backend OAuth endpoint
-  - [ ] Store tokens on success
-  - [ ] Redirect to /game
-  - [ ] Error display for failed OAuth
-
----
-
-### T043: Create Protected Route Guard
+ 
+### T039: Create Protected Route Guard
 - **Description:** Create route guard for authenticated-only pages.
 - **Technical Context:**
-  - Files: `frontend/src/routes/game/+layout.ts` (load function)
+  - Files: `frontend/src/routes/game/+layout.svelte`
 - **Acceptance Criteria:**
-  - [ ] Check auth store on navigation
+  - [ ] Check auth store
   - [ ] Redirect to /auth/login if not authenticated
-  - [ ] Pass user to child routes
-  - [ ] Handle token refresh if needed
+  - [ ] Show loading state while checking initial auth status
 
 ---
 
@@ -606,7 +549,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ## 1.4 Server & Player
 
-### T044: Create Server Model and Repository
+### [] T044: Create Server Model and Repository
 - **Description:** Implement Server model and repository.
 - **Technical Context:**
   - Files: `internal/model/server.go`, `internal/repository/server_repo.go`
@@ -618,7 +561,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T045: Create Player Model and Repository
+### [] T045: Create Player Model and Repository
 - **Description:** Implement Player model and repository.
 - **Technical Context:**
   - Files: `internal/model/player.go`, `internal/repository/player_repo.go`
@@ -631,7 +574,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T046: Create Tribe Model and Repository
+### [] T046: Create Tribe Model and Repository
 - **Description:** Implement Tribe model and repository.
 - **Technical Context:**
   - Files: `internal/model/tribe.go`, `internal/repository/tribe_repo.go`
@@ -643,7 +586,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T047: Implement Server Service
+### [] T047: Implement Server Service
 - **Description:** Create service for server operations.
 - **Technical Context:**
   - Files: `internal/service/server_service.go`
@@ -654,7 +597,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T048: Implement Player Service
+### [] T048: Implement Player Service
 - **Description:** Create service for player operations.
 - **Technical Context:**
   - Files: `internal/service/player_service.go`
@@ -666,7 +609,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T049: Implement Server Handlers
+### [] T049: Implement Server Handlers
 - **Description:** Create HTTP handlers for server endpoints.
 - **Technical Context:**
   - Files: `internal/handler/server.go`
@@ -680,7 +623,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T050: Implement Player Handlers
+### [] T050: Implement Player Handlers
 - **Description:** Create HTTP handlers for player endpoints.
 - **Technical Context:**
   - Files: `internal/handler/player.go`
@@ -693,7 +636,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T051: Create Server List Page (Frontend)
+### [] T051: Create Server List Page (Frontend)
 - **Description:** Create page to display available servers.
 - **Technical Context:**
   - Files: `frontend/src/routes/servers/+page.svelte`
@@ -705,7 +648,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T052: Create Tribe Selection Page (Frontend)
+### [] T052: Create Tribe Selection Page (Frontend)
 - **Description:** Create page for selecting tribe when joining server.
 - **Technical Context:**
   - Files: `frontend/src/routes/servers/[id]/join/+page.svelte`
@@ -718,7 +661,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T053: Create Player Store (Frontend)
+### [] T053: Create Player Store (Frontend)
 - **Description:** Create Svelte store for current player state.
 - **Technical Context:**
   - Files: `frontend/src/lib/stores/player.ts`
@@ -734,7 +677,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ## 1.5 Village Management
 
-### T054: Create Village Model and Repository
+### [] T054: Create Village Model and Repository
 - **Description:** Implement Village model and repository.
 - **Technical Context:**
   - Files: `internal/model/village.go`, `internal/repository/village_repo.go`
@@ -747,7 +690,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T055: Create Building Model and Repository
+### [] T055: Create Building Model and Repository
 - **Description:** Implement Building model and repository.
 - **Technical Context:**
   - Files: `internal/model/building.go`, `internal/repository/building_repo.go`
@@ -760,7 +703,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T056: Create Building Definitions Data
+### [] T056: Create Building Definitions Data
 - **Description:** Define building stats, costs, and requirements.
 - **Technical Context:**
   - Files: `internal/game/building_data.go`
@@ -773,7 +716,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T057: Implement Village Service
+### [] T057: Implement Village Service
 - **Description:** Create service for village operations.
 - **Technical Context:**
   - Files: `internal/service/village_service.go`
@@ -785,7 +728,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T058: Implement Building Service
+### [] T058: Implement Building Service
 - **Description:** Create service for building operations.
 - **Technical Context:**
   - Files: `internal/service/building_service.go`
@@ -798,7 +741,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T059: Implement Village Handlers
+### [] T059: Implement Village Handlers
 - **Description:** Create HTTP handlers for village endpoints.
 - **Technical Context:**
   - Files: `internal/handler/village.go`
@@ -811,7 +754,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T060: Implement Building Handlers
+### [] T060: Implement Building Handlers
 - **Description:** Create HTTP handlers for building endpoints.
 - **Technical Context:**
   - Files: `internal/handler/building.go`
@@ -824,7 +767,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T061: Create Village Store (Frontend)
+### [] T061: Create Village Store (Frontend)
 - **Description:** Create Svelte store for selected village.
 - **Technical Context:**
   - Files: `frontend/src/lib/stores/village.ts`
@@ -836,7 +779,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T062: Create Resource Store (Frontend)
+### [] T062: Create Resource Store (Frontend)
 - **Description:** Create Svelte store for live resource updates.
 - **Technical Context:**
   - Files: `frontend/src/lib/stores/resources.ts`
@@ -848,7 +791,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T063: Create ResourceBar Component
+### [] T063: Create ResourceBar Component
 - **Description:** Create reusable resource bar UI component.
 - **Technical Context:**
   - Files: `frontend/src/lib/components/game/ResourceBar.svelte`
@@ -861,7 +804,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T064: Create Village Overview Page
+### [] T064: Create Village Overview Page
 - **Description:** Create main village view page.
 - **Technical Context:**
   - Files: `frontend/src/routes/game/village/+page.svelte`
@@ -874,7 +817,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T065: Create BuildingSlot Component
+### [] T065: Create BuildingSlot Component
 - **Description:** Create component for building slot in village grid.
 - **Technical Context:**
   - Files: `frontend/src/lib/components/game/BuildingSlot.svelte`
@@ -886,7 +829,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T066: Create Building Details Modal
+### [] T066: Create Building Details Modal
 - **Description:** Create modal for building information and actions.
 - **Technical Context:**
   - Files: `frontend/src/lib/components/game/BuildingModal.svelte`
@@ -899,7 +842,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T067: Create Buildings List Page
+### [] T067: Create Buildings List Page
 - **Description:** Create page listing all buildings in village.
 - **Technical Context:**
   - Files: `frontend/src/routes/game/village/buildings/+page.svelte`
@@ -915,7 +858,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ## 1.6 Troop Training
 
-### T068: Create Troop Model and Repository
+### [] T068: Create Troop Model and Repository
 - **Description:** Implement Troop and TroopQueue models.
 - **Technical Context:**
   - Files: `internal/model/troop.go`, `internal/repository/troop_repo.go`
@@ -928,7 +871,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T069: Create Troop Definitions Data
+### [] T069: Create Troop Definitions Data
 - **Description:** Define troop stats and costs.
 - **Technical Context:**
   - Files: `internal/game/troop_data.go`
@@ -941,7 +884,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T070: Implement Troop Service
+### [] T070: Implement Troop Service
 - **Description:** Create service for troop operations.
 - **Technical Context:**
   - Files: `internal/service/troop_service.go`
@@ -954,7 +897,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T071: Implement Troop Handlers
+### [] T071: Implement Troop Handlers
 - **Description:** Create HTTP handlers for troop endpoints.
 - **Technical Context:**
   - Files: `internal/handler/troop.go`
@@ -967,7 +910,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T072: Create TroopCard Component
+### [] T072: Create TroopCard Component
 - **Description:** Create component for displaying troop info.
 - **Technical Context:**
   - Files: `frontend/src/lib/components/game/TroopCard.svelte`
@@ -979,7 +922,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T073: Create Troops Page
+### [] T073: Create Troops Page
 - **Description:** Create page for viewing and training troops.
 - **Technical Context:**
   - Files: `frontend/src/routes/game/village/troops/+page.svelte`
@@ -992,7 +935,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T074: Create Timer Component
+### [] T074: Create Timer Component
 - **Description:** Create reusable countdown timer component.
 - **Technical Context:**
   - Files: `frontend/src/lib/components/ui/Timer.svelte`
@@ -1009,7 +952,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ## 1.7 World Map
 
-### T075: Create MapTile Model and Repository
+### [] T075: Create MapTile Model and Repository
 - **Description:** Implement MapTile model for terrain data.
 - **Technical Context:**
   - Files: `internal/model/map_tile.go`, `internal/repository/map_repo.go`
@@ -1021,7 +964,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T076: Create Map Generation Script
+### [] T076: Create Map Generation Script
 - **Description:** Create script to generate map tiles for a server.
 - **Technical Context:**
   - Files: `scripts/generate_map.go`
@@ -1034,7 +977,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T077: Implement Map Service
+### [] T077: Implement Map Service
 - **Description:** Create service for map operations.
 - **Technical Context:**
   - Files: `internal/service/map_service.go`
@@ -1046,7 +989,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T078: Implement Map Handlers
+### [] T078: Implement Map Handlers
 - **Description:** Create HTTP handlers for map endpoints.
 - **Technical Context:**
   - Files: `internal/handler/map.go`
@@ -1059,7 +1002,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T079: Create MapTile Component
+### [] T079: Create MapTile Component
 - **Description:** Create component for single map tile.
 - **Technical Context:**
   - Files: `frontend/src/lib/components/game/MapTile.svelte`
@@ -1072,7 +1015,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T080: Create Map Page
+### [] T080: Create Map Page
 - **Description:** Create world map page with viewport.
 - **Technical Context:**
   - Files: `frontend/src/routes/game/map/+page.svelte`
@@ -1085,7 +1028,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T081: Create Map Search Component
+### [] T081: Create Map Search Component
 - **Description:** Create search box for finding locations.
 - **Technical Context:**
   - Files: `frontend/src/lib/components/game/MapSearch.svelte`
@@ -1097,7 +1040,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T082: Create Tile Details Modal
+### [] T082: Create Tile Details Modal
 - **Description:** Create modal for tile information and actions.
 - **Technical Context:**
   - Files: `frontend/src/lib/components/game/TileModal.svelte`
@@ -1114,7 +1057,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ## 1.8 Army Movement & Combat
 
-### T083: Create Army Model and Repository
+### [] T083: Create Army Model and Repository
 - **Description:** Implement Army model for moving troops.
 - **Technical Context:**
   - Files: `internal/model/army.go`, `internal/repository/army_repo.go`
@@ -1127,7 +1070,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T084: Implement Combat Formulas
+### [] T084: Implement Combat Formulas
 - **Description:** Create combat calculation formulas.
 - **Technical Context:**
   - Files: `internal/game/combat.go`, `internal/game/formula.go`
@@ -1141,7 +1084,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T085: Implement Army Service
+### [] T085: Implement Army Service
 - **Description:** Create service for army operations.
 - **Technical Context:**
   - Files: `internal/service/army_service.go`
@@ -1154,7 +1097,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T086: Implement Combat Service
+### [] T086: Implement Combat Service
 - **Description:** Create service for battle execution.
 - **Technical Context:**
   - Files: `internal/service/combat_service.go`
@@ -1167,7 +1110,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T087: Implement Army Handlers
+### [] T087: Implement Army Handlers
 - **Description:** Create HTTP handlers for army endpoints.
 - **Technical Context:**
   - Files: `internal/handler/army.go`
@@ -1180,7 +1123,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T088: Create Army Overview Page
+### [] T088: Create Army Overview Page
 - **Description:** Create page showing all player armies.
 - **Technical Context:**
   - Files: `frontend/src/routes/game/army/+page.svelte`
@@ -1192,7 +1135,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T089: Create Send Army Page
+### [] T089: Create Send Army Page
 - **Description:** Create page for sending troops.
 - **Technical Context:**
   - Files: `frontend/src/routes/game/army/send/+page.svelte`
@@ -1205,7 +1148,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T090: Create ArmyRow Component
+### [] T090: Create ArmyRow Component
 - **Description:** Create component for army list item.
 - **Technical Context:**
   - Files: `frontend/src/lib/components/game/ArmyRow.svelte`
@@ -1222,7 +1165,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ## 2.1 Tick Engine
 
-### T091: Create Game Tick Engine
+### [] T091: Create Game Tick Engine
 - **Description:** Implement main game tick engine that runs periodic updates.
 - **Technical Context:**
   - Files: `internal/game/engine.go`
@@ -1235,7 +1178,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T092: Implement Resource Tick
+### [] T092: Implement Resource Tick
 - **Description:** Create resource production tick (every 1 minute).
 - **Technical Context:**
   - Files: `internal/game/resource.go`
@@ -1248,7 +1191,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T093: Implement Building Tick
+### [] T093: Implement Building Tick
 - **Description:** Create building completion tick (every 1 second).
 - **Technical Context:**
   - Files: `internal/game/building_tick.go`
@@ -1261,7 +1204,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T094: Implement Troop Training Tick
+### [] T094: Implement Troop Training Tick
 - **Description:** Create troop training completion tick (every 1 second).
 - **Technical Context:**
   - Files: `internal/game/troop_tick.go`
@@ -1274,7 +1217,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T095: Implement Army Arrival Tick
+### [] T095: Implement Army Arrival Tick
 - **Description:** Create army arrival processing tick (every 1 second).
 - **Technical Context:**
   - Files: `internal/game/army_tick.go`
@@ -1287,7 +1230,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T096: Implement Starvation Tick
+### [] T096: Implement Starvation Tick
 - **Description:** Create starvation processing tick (every 5 minutes).
 - **Technical Context:**
   - Files: `internal/game/starvation.go`
@@ -1304,7 +1247,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ## 2.2 WebSocket & Notifications
 
-### T097: Create WebSocket Hub
+### [] T097: Create WebSocket Hub
 - **Description:** Implement WebSocket connection hub.
 - **Technical Context:**
   - Files: `internal/realtime/hub.go`
@@ -1317,7 +1260,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T098: Create WebSocket Client Handler
+### [] T098: Create WebSocket Client Handler
 - **Description:** Implement WebSocket client connection handler.
 - **Technical Context:**
   - Files: `internal/realtime/client.go`
@@ -1330,7 +1273,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T099: Define WebSocket Events
+### [] T099: Define WebSocket Events
 - **Description:** Define all WebSocket event types and payloads.
 - **Technical Context:**
   - Files: `internal/realtime/events.go`
@@ -1343,7 +1286,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T100: Integrate WebSocket with Handlers
+### [] T100: Integrate WebSocket with Handlers
 - **Description:** Add WebSocket endpoint to HTTP server.
 - **Technical Context:**
   - Files: `internal/handler/websocket.go`, `internal/server/routes.go`
@@ -1355,7 +1298,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T101: Integrate WebSocket with Game Engine
+### [] T101: Integrate WebSocket with Game Engine
 - **Description:** Trigger WebSocket events from game ticks.
 - **Technical Context:**
   - Files: Update `internal/game/*.go` files
@@ -1367,7 +1310,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T102: Create Notification Service
+### [] T102: Create Notification Service
 - **Description:** Create service for managing notifications.
 - **Technical Context:**
   - Files: `internal/service/notification_service.go`
@@ -1380,7 +1323,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T103: Create Notification Store (Frontend)
+### [] T103: Create Notification Store (Frontend)
 - **Description:** Create Svelte store for notifications.
 - **Technical Context:**
   - Files: `frontend/src/lib/stores/notifications.ts`
@@ -1393,7 +1336,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T104: Create Toast Component
+### [] T104: Create Toast Component
 - **Description:** Create toast notification component.
 - **Technical Context:**
   - Files: `frontend/src/lib/components/ui/Toast.svelte`
@@ -1410,7 +1353,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ## 2.3 Alliance Features
 
-### T105: Create Alliance Model and Repository
+### [] T105: Create Alliance Model and Repository
 - **Description:** Implement Alliance and AllianceMember models.
 - **Technical Context:**
   - Files: `internal/model/alliance.go`, `internal/repository/alliance_repo.go`
@@ -1423,7 +1366,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T106: Implement Alliance Service
+### [] T106: Implement Alliance Service
 - **Description:** Create service for alliance operations.
 - **Technical Context:**
   - Files: `internal/service/alliance_service.go`
@@ -1437,7 +1380,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T107: Implement Alliance Handlers
+### [] T107: Implement Alliance Handlers
 - **Description:** Create HTTP handlers for alliance endpoints.
 - **Technical Context:**
   - Files: `internal/handler/alliance.go`
@@ -1449,7 +1392,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T108: Create Alliance Home Page
+### [] T108: Create Alliance Home Page
 - **Description:** Create alliance overview page.
 - **Technical Context:**
   - Files: `frontend/src/routes/game/alliance/+page.svelte`
@@ -1462,7 +1405,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T109: Create Alliance Members Page
+### [] T109: Create Alliance Members Page
 - **Description:** Create page for managing alliance members.
 - **Technical Context:**
   - Files: `frontend/src/routes/game/alliance/members/+page.svelte`
@@ -1475,7 +1418,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T110: Create Alliance Diplomacy Page
+### [] T110: Create Alliance Diplomacy Page
 - **Description:** Create page for NAP and war declarations.
 - **Technical Context:**
   - Files: `frontend/src/routes/game/alliance/diplomacy/+page.svelte`
@@ -1487,7 +1430,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T111: Create Alliance Chat Page
+### [] T111: Create Alliance Chat Page
 - **Description:** Create alliance chat page.
 - **Technical Context:**
   - Files: `frontend/src/routes/game/alliance/chat/+page.svelte`
@@ -1504,7 +1447,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ## 2.4 Communication
 
-### T112: Create Report Model and Repository
+### [] T112: Create Report Model and Repository
 - **Description:** Implement Report model for battle/trade/scout reports.
 - **Technical Context:**
   - Files: `internal/model/report.go`, `internal/repository/report_repo.go`
@@ -1517,7 +1460,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T113: Implement Report Service
+### [] T113: Implement Report Service
 - **Description:** Create service for report operations.
 - **Technical Context:**
   - Files: `internal/service/report_service.go`
@@ -1529,7 +1472,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T114: Implement Report Handlers
+### [] T114: Implement Report Handlers
 - **Description:** Create HTTP handlers for report endpoints.
 - **Technical Context:**
   - Files: `internal/handler/report.go`
@@ -1542,7 +1485,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T115: Create Reports List Page
+### [] T115: Create Reports List Page
 - **Description:** Create page listing all reports.
 - **Technical Context:**
   - Files: `frontend/src/routes/game/reports/+page.svelte`
@@ -1555,7 +1498,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T116: Create Report Details Page
+### [] T116: Create Report Details Page
 - **Description:** Create page for viewing report details.
 - **Technical Context:**
   - Files: `frontend/src/routes/game/reports/[id]/+page.svelte`
@@ -1567,7 +1510,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T117: Create Message Model and Repository
+### [] T117: Create Message Model and Repository
 - **Description:** Implement Message model for private/alliance messages.
 - **Technical Context:**
   - Files: `internal/model/message.go`, `internal/repository/message_repo.go`
@@ -1579,7 +1522,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T118: Implement Message Handlers
+### [] T118: Implement Message Handlers
 - **Description:** Create HTTP handlers for message endpoints.
 - **Technical Context:**
   - Files: `internal/handler/message.go`
@@ -1591,7 +1534,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T119: Create Messages Page
+### [] T119: Create Messages Page
 - **Description:** Create private messages page.
 - **Technical Context:**
   - Files: `frontend/src/routes/game/messages/+page.svelte`
@@ -1608,7 +1551,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ## 2.5 Monetization
 
-### T120: Create Transaction Model and Repository
+### [] T120: Create Transaction Model and Repository
 - **Description:** Implement Transaction model for payment history.
 - **Technical Context:**
   - Files: `internal/model/transaction.go`, `internal/repository/transaction_repo.go`
@@ -1620,7 +1563,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T121: Implement Shop Service
+### [] T121: Implement Shop Service
 - **Description:** Create service for shop operations.
 - **Technical Context:**
   - Files: `internal/service/shop_service.go`
@@ -1633,7 +1576,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T122: Implement Payment Webhook Handler
+### [] T122: Implement Payment Webhook Handler
 - **Description:** Create webhook handler for payment provider callbacks.
 - **Technical Context:**
   - Files: `internal/handler/shop.go`
@@ -1647,7 +1590,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T123: Implement Shop Handlers
+### [] T123: Implement Shop Handlers
 - **Description:** Create HTTP handlers for shop endpoints.
 - **Technical Context:**
   - Files: `internal/handler/shop.go`
@@ -1660,7 +1603,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T124: Create Shop Page
+### [] T124: Create Shop Page
 - **Description:** Create in-game shop page.
 - **Technical Context:**
   - Files: `frontend/src/routes/game/shop/+page.svelte`
@@ -1673,7 +1616,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T125: Implement VIP Benefits
+### [] T125: Implement VIP Benefits
 - **Description:** Implement VIP-specific features throughout the app.
 - **Technical Context:**
   - Files: Update various service files
@@ -1690,7 +1633,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ## 3.1 Final Features
 
-### T126: Implement Full i18n Support
+### [] T126: Implement Full i18n Support
 - **Description:** Complete internationalization for all text.
 - **Technical Context:**
   - Files: `frontend/src/lib/i18n/locales/*.json`
@@ -1703,7 +1646,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T127: Create Game Dashboard
+### [] T127: Create Game Dashboard
 - **Description:** Create main dashboard page after login.
 - **Technical Context:**
   - Files: `frontend/src/routes/game/+page.svelte`
@@ -1716,7 +1659,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T128: Create Settings Page
+### [] T128: Create Settings Page
 - **Description:** Create user settings page.
 - **Technical Context:**
   - Files: `frontend/src/routes/game/settings/+page.svelte`
@@ -1729,7 +1672,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T129: Create Game Layout with Sidebar
+### [] T129: Create Game Layout with Sidebar
 - **Description:** Create main game layout with navigation.
 - **Technical Context:**
   - Files: `frontend/src/routes/game/+layout.svelte`
@@ -1742,7 +1685,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T130: Create Landing Page
+### [] T130: Create Landing Page
 - **Description:** Create public landing page for the game.
 - **Technical Context:**
   - Files: `frontend/src/routes/+page.svelte`
@@ -1755,7 +1698,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T131: Implement Error Handling & Loading States
+### [] T131: Implement Error Handling & Loading States
 - **Description:** Add consistent error and loading UI throughout app.
 - **Technical Context:**
   - Files: Various frontend components
@@ -1768,7 +1711,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T132: Performance Optimization - Backend
+### [] T132: Performance Optimization - Backend
 - **Description:** Optimize backend performance.
 - **Technical Context:**
   - Files: Various backend files
@@ -1781,7 +1724,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T133: Performance Optimization - Frontend
+### [] T133: Performance Optimization - Frontend
 - **Description:** Optimize frontend performance.
 - **Technical Context:**
   - Files: Various frontend files
@@ -1794,7 +1737,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T134: Security Audit & Hardening
+### [] T134: Security Audit & Hardening
 - **Description:** Conduct security review and implement fixes.
 - **Technical Context:**
   - Files: Various files
@@ -1807,7 +1750,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T135: Mobile Responsiveness
+### [] T135: Mobile Responsiveness
 - **Description:** Ensure all pages work on mobile devices.
 - **Technical Context:**
   - Files: Various frontend files
@@ -1820,7 +1763,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T136: Create E2E Test Suite
+### [] T136: Create E2E Test Suite
 - **Description:** Create end-to-end tests for critical flows.
 - **Technical Context:**
   - Files: `frontend/tests/e2e/*.spec.ts`
@@ -1834,7 +1777,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T137: Setup CI/CD Pipeline
+### [] T137: Setup CI/CD Pipeline
 - **Description:** Create GitHub Actions workflow for CI/CD.
 - **Technical Context:**
   - Files: `.github/workflows/*.yml`
@@ -1847,7 +1790,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T138: Create Production Dockerfile
+### [] T138: Create Production Dockerfile
 - **Description:** Create optimized Dockerfiles for production.
 - **Technical Context:**
   - Files: `backend/Dockerfile`, `frontend/Dockerfile`
@@ -1860,7 +1803,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T139: Setup Monitoring & Alerting
+### [] T139: Setup Monitoring & Alerting
 - **Description:** Configure monitoring with Prometheus and Grafana.
 - **Technical Context:**
   - Files: `infra/prometheus.yml`, `infra/grafana/`
@@ -1873,7 +1816,7 @@ Each task is small enough to be reviewed and tested independently.
 
 ---
 
-### T140: Documentation & README
+### [] T140: Documentation & README
 - **Description:** Create comprehensive documentation.
 - **Technical Context:**
   - Files: `README.md`, `docs/*.md`
