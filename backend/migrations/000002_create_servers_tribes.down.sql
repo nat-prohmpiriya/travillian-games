@@ -1,0 +1,4 @@
+DROP TABLE IF EXISTS tribes;
+DROP TABLE IF EXISTS servers;
+DROP TYPE IF EXISTS tribe_code;
+DROP TYPE IF EXISTS server_status;
