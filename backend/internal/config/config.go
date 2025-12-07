@@ -80,6 +80,7 @@ func Load() (*Config, error) {
 	viper.SetDefault("REDIS_POOL_SIZE", 100)
 
 	viper.SetDefault("OTEL_EXPORTER_OTLP_PROTOCOL", "grpc")
+	viper.SetDefault("POSTGRES_DB", "tusk_horn")
 	viper.SetDefault("OTEL_SERVICE_NAME", "tusk-horn")
 
 	// Attempt to read .env, but don't fail if missing (rely on env vars)
