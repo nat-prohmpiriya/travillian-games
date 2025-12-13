@@ -16,7 +16,12 @@
       "Bash(go mod init:*)",
       "Bash(go work sync:*)",
       "Bash(go get:*)",
-      "Bash(go mod tidy:*)"
+      "Bash(go mod tidy:*)",
+      "Bash(mv:*)",
+      "Bash(rm:*)",
+      "Bash(cargo check:*)",
+      "Bash(rustc:*)",
+      "Bash(cargo --version:*)"
     ],
     "deny": [],
     "ask": []

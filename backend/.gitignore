@@ -1,32 +1,29 @@
-# Binaries
-/bin/
-/server
-*.exe
-*.exe~
-*.dll
-*.so
-*.dylib
+# Rust build artifacts
+/target/
+# Note: Cargo.lock is committed for applications (not libraries)
 
-# Service Account & Secrets
-serviceAccountKey.json
-*.pem
-*.key
-
-# Environment Files
+# Environment
 .env
 .env.local
 .env.*.local
 
-# IDEs
-.idea
-.vscode
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
 .DS_Store
+Thumbs.db
 
-# Test output
-coverage.out
-profile.out
+# Logs
+*.log
 
-# Vendor
-vendor/
+# Firebase credentials
+firebase-service-account.json
+*-service-account.json
 
-firebase-key.json
+# Debug
+debug/
+*.pdb
