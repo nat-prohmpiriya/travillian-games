@@ -1,0 +1,195 @@
+{
+  "app": {
+    "title": "Tusk & Horn",
+    "tagline": "เกมวางแผนอาณาจักรอุษาคเนย์",
+    "description": "สร้างอาณาจักร ฝึกกองทัพ พิชิตดินแดน"
+  },
+  "nav": {
+    "home": "หน้าหลัก",
+    "map": "แผนที่",
+    "village": "หมู่บ้าน",
+    "alliance": "พันธมิตร",
+    "reports": "รายงาน",
+    "messages": "ข้อความ",
+    "settings": "ตั้งค่า",
+    "logout": "ออกจากระบบ"
+  },
+  "auth": {
+    "login": "เข้าสู่ระบบ",
+    "register": "สมัครสมาชิก",
+    "email": "อีเมล",
+    "password": "รหัสผ่าน",
+    "confirmPassword": "ยืนยันรหัสผ่าน",
+    "forgotPassword": "ลืมรหัสผ่าน?",
+    "noAccount": "ยังไม่มีบัญชี?",
+    "hasAccount": "มีบัญชีอยู่แล้ว?",
+    "loginWith": "เข้าสู่ระบบด้วย {provider}",
+    "orContinueWith": "หรือดำเนินการด้วย"
+  },
+  "onboarding": {
+    "welcome": "ยินดีต้อนรับสู่ Tusk & Horn",
+    "chooseTribe": "เลือกเผ่าของคุณ",
+    "enterName": "ตั้งชื่อผู้เล่น",
+    "playerName": "ชื่อผู้เล่น",
+    "startGame": "เริ่มเกม",
+    "tribes": {
+      "phasuttha": {
+        "name": "ภาคพื้น (Phasuttha)",
+        "description": "เผ่าสมดุลกับช้างศึกทรงพลังและกำแพงหนา ผู้เชี่ยวชาญแห่งที่ราบ"
+      },
+      "nava": {
+        "name": "ชาวเล (Nava)",
+        "description": "นักปล้นสะดมรวดเร็วด้วยเรือเร็วและทักษะการค้าขายเยี่ยม ผู้เชี่ยวชาญแห่งท้องทะเล"
+      },
+      "kiri": {
+        "name": "ชาวเขา (Kiri)",
+        "description": "เผ่าป้องกันด้วยกับดักอันตรายและความชำนาญสงครามบนภูเขา ผู้เชี่ยวชาญแห่งยอดเขา"
+      }
+    }
+  },
+  "resources": {
+    "wood": "ไม้",
+    "clay": "ดินเหนียว",
+    "iron": "เหล็ก",
+    "crop": "อาหาร",
+    "gold": "ทอง",
+    "population": "ประชากร",
+    "warehouse": "โกดัง",
+    "granary": "ยุ้งฉาง"
+  },
+  "buildings": {
+    "main_building": "อาคารหลัก",
+    "warehouse": "โกดัง",
+    "granary": "ยุ้งฉาง",
+    "barracks": "ค่ายทหาร",
+    "stable": "คอกม้า",
+    "elephant_ground": "ลานฝึกช้าง",
+    "workshop": "โรงงาน",
+    "academy": "สถาบัน",
+    "smithy": "โรงตีเหล็ก",
+    "market": "ตลาด",
+    "embassy": "สถานทูต",
+    "palace": "พระราชวัง",
+    "residence": "ที่พักอาศัย",
+    "wall": "กำแพง",
+    "rally_point": "จุดรวมพล",
+    "cranny": "ที่ซ่อน",
+    "hero_mansion": "คฤหาสน์วีรบุรุษ",
+    "tavern": "โรงเตี๊ยม",
+    "woodcutter": "ที่ตัดไม้",
+    "clay_pit": "บ่อดิน",
+    "iron_mine": "เหมืองเหล็ก",
+    "crop_field": "ไร่นา",
+    "empty_slot": "ช่องว่าง",
+    "build": "สร้าง",
+    "upgrade": "อัปเกรด",
+    "level": "ระดับ",
+    "maxLevel": "ระดับสูงสุด",
+    "constructionTime": "เวลาก่อสร้าง",
+    "requirements": "ความต้องการ"
+  },
+  "troops": {
+    "train": "ฝึก",
+    "training": "กำลังฝึก",
+    "count": "จำนวน",
+    "attack": "โจมตี",
+    "defense": "ป้องกัน",
+    "speed": "ความเร็ว",
+    "capacity": "ความจุ",
+    "infantry": "ทหารราบ",
+    "spearman": "ทหารหอก",
+    "war_elephant": "ช้างศึก",
+    "buffalo_wagon": "เกวียนควาย",
+    "kris_warrior": "นักรบกริช",
+    "sea_diver": "นักดำน้ำ",
+    "war_prahu": "เรือรบ",
+    "merchant_ship": "เรือสินค้า",
+    "crossbowman": "นักหน้าไม้",
+    "mountain_warrior": "นักรบภูเขา",
+    "highland_pony": "ม้าที่สูง",
+    "trap_maker": "ช่างกับดัก",
+    "swamp_dragon": "ตัวเหี้ย",
+    "scout": "หน่วยสอดแนม"
+  },
+  "army": {
+    "send": "ส่งกองทัพ",
+    "mission": "ภารกิจ",
+    "raid": "ปล้น",
+    "attack": "โจมตี",
+    "support": "สนับสนุน",
+    "scout": "สอดแนม",
+    "target": "เป้าหมาย",
+    "arrivalTime": "เวลาถึง",
+    "returnTime": "เวลากลับ",
+    "recall": "เรียกกลับ"
+  },
+  "alliance": {
+    "create": "สร้างพันธมิตร",
+    "join": "เข้าร่วมพันธมิตร",
+    "leave": "ออกจากพันธมิตร",
+    "members": "สมาชิก",
+    "diplomacy": "การทูต",
+    "chat": "แชทพันธมิตร",
+    "bank": "คลังพันธมิตร",
+    "invite": "เชิญ",
+    "kick": "เตะออก",
+    "promote": "เลื่อนตำแหน่ง",
+    "roles": {
+      "leader": "ผู้นำ",
+      "co_leader": "รองผู้นำ",
+      "officer": "เจ้าหน้าที่",
+      "diplomat": "นักการทูต",
+      "member": "สมาชิก"
+    }
+  },
+  "landing": {
+    "playNow": "เล่นเลย",
+    "startJourney": "เริ่มการผจญภัย",
+    "continuePlaying": "เล่นต่อ",
+    "forgeYourLegacy": "สร้างตำนานของคุณ",
+    "chooseYourTribe": "เลือกเผ่าของคุณ",
+    "chooseYourTribeDesc": "สามอารยธรรมโบราณ แต่ละเผ่ามีจุดแข็งและหน่วยรบในตำนานเฉพาะตัว",
+    "readyToConquer": "พร้อมพิชิตแล้วหรือยัง?",
+    "readyToConquerDesc": "เข้าร่วมกับผู้เล่นนับพันในประสบการณ์เกมวางแผนอุษาคเนย์สุดยิ่งใหญ่ อาณาจักรของคุณรอคอยอยู่",
+    "createFreeAccount": "สร้างบัญชีฟรี",
+    "features": {
+      "buildKingdom": "สร้างอาณาจักร",
+      "buildKingdomDesc": "สร้างอาคาร รวบรวมทรัพยากร และขยายดินแดนของคุณ",
+      "trainArmies": "ฝึกกองทัพอันยิ่งใหญ่",
+      "trainArmiesDesc": "บัญชาการช้างศึก นักรบกริช และทหารม้าที่สูงเพื่อพิชิตศัตรู",
+      "formAlliances": "สร้างพันธมิตร",
+      "formAlliancesDesc": "รวมพลังกับผู้เล่นอื่น แบ่งปันทรัพยากร และครองโลกด้วยกัน",
+      "realTimeStrategy": "วางแผนเรียลไทม์",
+      "realTimeStrategyDesc": "ทุกการตัดสินใจมีความหมาย วางแผนการโจมตี ป้องกันหมู่บ้าน ปล้นทรัพยากร"
+    }
+  },
+  "common": {
+    "confirm": "ยืนยัน",
+    "cancel": "ยกเลิก",
+    "close": "ปิด",
+    "save": "บันทึก",
+    "delete": "ลบ",
+    "edit": "แก้ไข",
+    "loading": "กำลังโหลด...",
+    "error": "ข้อผิดพลาด",
+    "success": "สำเร็จ",
+    "warning": "คำเตือน",
+    "info": "ข้อมูล",
+    "yes": "ใช่",
+    "no": "ไม่",
+    "ok": "ตกลง",
+    "back": "กลับ",
+    "next": "ถัดไป",
+    "search": "ค้นหา",
+    "filter": "กรอง",
+    "sort": "เรียงลำดับ",
+    "refresh": "รีเฟรช",
+    "perHour": "/ชม."
+  },
+  "time": {
+    "seconds": "วินาที",
+    "minutes": "นาที",
+    "hours": "ชั่วโมง",
+    "days": "วัน"
+  }
+}

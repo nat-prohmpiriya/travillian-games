@@ -1,0 +1,195 @@
+{
+  "app": {
+    "title": "Tusk & Horn",
+    "tagline": "Southeast Asian Strategy Game",
+    "description": "Build your kingdom, train your army, conquer the land"
+  },
+  "nav": {
+    "home": "Home",
+    "map": "Map",
+    "village": "Village",
+    "alliance": "Alliance",
+    "reports": "Reports",
+    "messages": "Messages",
+    "settings": "Settings",
+    "logout": "Logout"
+  },
+  "auth": {
+    "login": "Login",
+    "register": "Register",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "forgotPassword": "Forgot Password?",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "loginWith": "Login with {provider}",
+    "orContinueWith": "Or continue with"
+  },
+  "onboarding": {
+    "welcome": "Welcome to Tusk & Horn",
+    "chooseTribe": "Choose Your Tribe",
+    "enterName": "Enter Your Name",
+    "playerName": "Player Name",
+    "startGame": "Start Game",
+    "tribes": {
+      "phasuttha": {
+        "name": "Phasuttha (Mainland)",
+        "description": "Balanced tribe with powerful War Elephants and thick walls. Masters of the plains."
+      },
+      "nava": {
+        "name": "Nava (Maritime)",
+        "description": "Swift raiders with fast ships and excellent trading skills. Masters of the seas."
+      },
+      "kiri": {
+        "name": "Kiri (Highland)",
+        "description": "Defensive tribe with deadly traps and mountain warfare expertise. Masters of the heights."
+      }
+    }
+  },
+  "resources": {
+    "wood": "Wood",
+    "clay": "Clay",
+    "iron": "Iron",
+    "crop": "Crop",
+    "gold": "Gold",
+    "population": "Population",
+    "warehouse": "Warehouse",
+    "granary": "Granary"
+  },
+  "buildings": {
+    "main_building": "Main Building",
+    "warehouse": "Warehouse",
+    "granary": "Granary",
+    "barracks": "Barracks",
+    "stable": "Stable",
+    "elephant_ground": "Elephant Training Ground",
+    "workshop": "Workshop",
+    "academy": "Academy",
+    "smithy": "Smithy",
+    "market": "Market",
+    "embassy": "Embassy",
+    "palace": "Palace",
+    "residence": "Residence",
+    "wall": "Wall",
+    "rally_point": "Rally Point",
+    "cranny": "Cranny",
+    "hero_mansion": "Hero Mansion",
+    "tavern": "Tavern",
+    "woodcutter": "Woodcutter",
+    "clay_pit": "Clay Pit",
+    "iron_mine": "Iron Mine",
+    "crop_field": "Crop Field",
+    "empty_slot": "Empty Slot",
+    "build": "Build",
+    "upgrade": "Upgrade",
+    "level": "Level",
+    "maxLevel": "Max Level",
+    "constructionTime": "Construction Time",
+    "requirements": "Requirements"
+  },
+  "troops": {
+    "train": "Train",
+    "training": "Training",
+    "count": "Count",
+    "attack": "Attack",
+    "defense": "Defense",
+    "speed": "Speed",
+    "capacity": "Carry Capacity",
+    "infantry": "Infantry",
+    "spearman": "Spearman",
+    "war_elephant": "War Elephant",
+    "buffalo_wagon": "Buffalo Wagon",
+    "kris_warrior": "Kris Warrior",
+    "sea_diver": "Sea Diver",
+    "war_prahu": "War Prahu",
+    "merchant_ship": "Merchant Ship",
+    "crossbowman": "Crossbowman",
+    "mountain_warrior": "Mountain Warrior",
+    "highland_pony": "Highland Pony",
+    "trap_maker": "Trap Maker",
+    "swamp_dragon": "Swamp Dragon",
+    "scout": "Scout"
+  },
+  "army": {
+    "send": "Send Army",
+    "mission": "Mission",
+    "raid": "Raid",
+    "attack": "Attack",
+    "support": "Support",
+    "scout": "Scout",
+    "target": "Target",
+    "arrivalTime": "Arrival Time",
+    "returnTime": "Return Time",
+    "recall": "Recall"
+  },
+  "alliance": {
+    "create": "Create Alliance",
+    "join": "Join Alliance",
+    "leave": "Leave Alliance",
+    "members": "Members",
+    "diplomacy": "Diplomacy",
+    "chat": "Alliance Chat",
+    "bank": "Alliance Bank",
+    "invite": "Invite",
+    "kick": "Kick",
+    "promote": "Promote",
+    "roles": {
+      "leader": "Leader",
+      "co_leader": "Co-Leader",
+      "officer": "Officer",
+      "diplomat": "Diplomat",
+      "member": "Member"
+    }
+  },
+  "landing": {
+    "playNow": "Play Now",
+    "startJourney": "Start Your Journey",
+    "continuePlaying": "Continue Playing",
+    "forgeYourLegacy": "Forge Your Legacy",
+    "chooseYourTribe": "Choose Your Tribe",
+    "chooseYourTribeDesc": "Three ancient civilizations, each with unique strengths and legendary units.",
+    "readyToConquer": "Ready to Conquer?",
+    "readyToConquerDesc": "Join thousands of players in the ultimate Southeast Asian strategy experience. Your empire awaits.",
+    "createFreeAccount": "Create Free Account",
+    "features": {
+      "buildKingdom": "Build Your Kingdom",
+      "buildKingdomDesc": "Construct buildings, gather resources, and expand your territory across the land.",
+      "trainArmies": "Train Mighty Armies",
+      "trainArmiesDesc": "Command War Elephants, Kris Warriors, and Highland Cavalry to conquer your enemies.",
+      "formAlliances": "Form Alliances",
+      "formAlliancesDesc": "Unite with other players, share resources, and dominate the world together.",
+      "realTimeStrategy": "Real-Time Strategy",
+      "realTimeStrategyDesc": "Every decision matters. Plan your attacks, defend your villages, raid for resources."
+    }
+  },
+  "common": {
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "close": "Close",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "warning": "Warning",
+    "info": "Info",
+    "yes": "Yes",
+    "no": "No",
+    "ok": "OK",
+    "back": "Back",
+    "next": "Next",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "refresh": "Refresh",
+    "perHour": "/hr"
+  },
+  "time": {
+    "seconds": "seconds",
+    "minutes": "minutes",
+    "hours": "hours",
+    "days": "days"
+  }
+}
