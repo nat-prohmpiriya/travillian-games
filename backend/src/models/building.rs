@@ -211,4 +211,18 @@ impl BuildingType {
         let base = 3;
         (base as f64 * (1.63_f64).powi(level - 1) * 1.0034_f64.powi((level - 1) * (level - 1))) as i32
     }
+
+    /// Storage capacity for Warehouse/Granary at given level
+    /// Based on Travian formula: base * 1.2^level
+    pub fn storage_capacity(&self, level: i32) -> i32 {
+        if level == 0 {
+            return 800; // Base capacity
+        }
+        let base = match self {
+            BuildingType::Warehouse => 400,
+            BuildingType::Granary => 400,
+            _ => return 0,
+        };
+        (base as f64 * (1.2_f64).powi(level)) as i32
+    }
 }

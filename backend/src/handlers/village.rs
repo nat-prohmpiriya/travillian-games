@@ -8,7 +8,7 @@ use uuid::Uuid;
 
 use crate::error::{AppError, AppResult};
 use crate::middleware::AuthenticatedUser;
-use crate::models::village::{CreateVillage, UpdateVillage, VillageResponse};
+use crate::models::village::{CreateVillage, ProductionRates, UpdateVillage, VillageResponse};
 use crate::repositories::user_repo::UserRepository;
 use crate::repositories::village_repo::VillageRepository;
 use crate::services::resource_service::ResourceService;
@@ -52,7 +52,17 @@ pub async fn get_village(
     // Update resources based on time elapsed before returning
     let village = ResourceService::update_village_resources(&state.db, village_id).await?;
 
-    Ok(Json(village.into()))
+    // Calculate production rates
+    let production = ResourceService::calculate_production(&state.db, village_id).await?;
+    let production_rates = ProductionRates {
+        wood_per_hour: production.wood_per_hour,
+        clay_per_hour: production.clay_per_hour,
+        iron_per_hour: production.iron_per_hour,
+        crop_per_hour: production.crop_per_hour,
+    };
+
+    let response: VillageResponse = village.into();
+    Ok(Json(response.with_production(production_rates)))
 }
 
 #[derive(Debug, Deserialize)]

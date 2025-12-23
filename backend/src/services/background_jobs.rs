@@ -4,6 +4,7 @@ use tokio::time::interval;
 use tracing::{error, info};
 
 use crate::repositories::building_repo::BuildingRepository;
+use crate::services::building_service::BuildingService;
 use crate::services::resource_service::ResourceService;
 
 /// Start all background jobs
@@ -49,7 +50,8 @@ async fn complete_building_upgrades(pool: &PgPool) -> anyhow::Result<i32> {
     let mut completed = 0;
 
     for building in buildings {
-        match BuildingRepository::complete_upgrade(pool, building.id).await {
+        // Use BuildingService to handle upgrade completion with side effects
+        match BuildingService::complete_upgrade(pool, building.id).await {
             Ok(updated) => {
                 info!(
                     "Building {:?} upgraded to level {} in village {}",

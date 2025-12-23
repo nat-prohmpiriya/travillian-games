@@ -44,6 +44,14 @@ pub struct UpdateVillage {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ProductionRates {
+    pub wood_per_hour: i32,
+    pub clay_per_hour: i32,
+    pub iron_per_hour: i32,
+    pub crop_per_hour: i32,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct VillageResponse {
     pub id: Uuid,
     pub name: String,
@@ -60,6 +68,8 @@ pub struct VillageResponse {
     pub culture_points: i32,
     pub loyalty: i32,
     pub created_at: DateTime<Utc>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub production: Option<ProductionRates>,
 }
 
 impl From<Village> for VillageResponse {
@@ -80,7 +90,15 @@ impl From<Village> for VillageResponse {
             culture_points: v.culture_points,
             loyalty: v.loyalty,
             created_at: v.created_at,
+            production: None,
         }
+    }
+}
+
+impl VillageResponse {
+    pub fn with_production(mut self, production: ProductionRates) -> Self {
+        self.production = Some(production);
+        self
     }
 }
 
