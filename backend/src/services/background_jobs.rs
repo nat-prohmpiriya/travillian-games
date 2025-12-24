@@ -4,6 +4,7 @@ use tokio::time::interval;
 use tracing::{error, info};
 
 use crate::repositories::building_repo::BuildingRepository;
+use crate::services::army_service::ArmyService;
 use crate::services::building_service::BuildingService;
 use crate::services::resource_service::ResourceService;
 
@@ -19,6 +20,12 @@ pub async fn start_background_jobs(pool: PgPool) {
     let pool_clone = pool.clone();
     tokio::spawn(async move {
         run_resource_production_job(pool_clone).await;
+    });
+
+    // Spawn army processing job
+    let pool_clone = pool.clone();
+    tokio::spawn(async move {
+        run_army_processing_job(pool_clone).await;
     });
 
     info!("Background jobs started");
@@ -83,6 +90,26 @@ async fn run_resource_production_job(pool: PgPool) {
             }
             Err(e) => {
                 error!("Error updating village resources: {:?}", e);
+            }
+        }
+    }
+}
+
+/// Process army arrivals every 5 seconds
+async fn run_army_processing_job(pool: PgPool) {
+    let mut ticker = interval(Duration::from_secs(5));
+
+    loop {
+        ticker.tick().await;
+
+        match ArmyService::process_arrived_armies(&pool).await {
+            Ok(count) => {
+                if count > 0 {
+                    info!("Processed {} army arrivals", count);
+                }
+            }
+            Err(e) => {
+                error!("Error processing army arrivals: {:?}", e);
             }
         }
     }
