@@ -21,10 +21,9 @@ async function request<T>(method: RequestMethod, endpoint: string, options: Requ
         },
     };
 
-    if (useAuth && auth.currentUser) {
+    if (useAuth && auth?.currentUser) {
         const token = await auth.currentUser.getIdToken();
-        // @ts-ignore
-        config.headers['Authorization'] = `Bearer ${token}`;
+        (config.headers as Record<string, string>)['Authorization'] = `Bearer ${token}`;
     }
 
     if (body) {

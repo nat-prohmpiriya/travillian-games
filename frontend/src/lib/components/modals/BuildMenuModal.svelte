@@ -21,24 +21,34 @@
     available: boolean;
   }
 
+  interface VillageResources {
+    wood: number;
+    clay: number;
+    iron: number;
+    crop: number;
+  }
+
   interface Props {
     open: boolean;
     slot: number;
     isResourceField?: boolean;
+    villageResources?: VillageResources;
     onBuild?: (type: BuildingType) => void;
+    loading?: boolean;
+    error?: string;
   }
 
-  let { open = $bindable(false), slot, isResourceField = false, onBuild }: Props = $props();
+  let { open = $bindable(false), slot, isResourceField = false, villageResources, onBuild, loading = false, error = '' }: Props = $props();
 
   let selectedCategory = $state<'all' | 'infrastructure' | 'military' | 'special'>('all');
 
-  // Mock player resources
-  const playerResources = {
+  // Use village resources if provided, otherwise fallback to mock data
+  const playerResources = $derived(villageResources || {
     wood: 1250,
     clay: 980,
     iron: 750,
     crop: 1100
-  };
+  });
 
   // Available buildings for village center
   const villageBuildOptions: BuildOption[] = [
@@ -204,9 +214,9 @@
   }
 
   function handleBuild(option: BuildOption) {
-    if (!option.available || !canAfford(option.cost)) return;
+    if (!option.available || !canAfford(option.cost) || loading) return;
     onBuild?.(option.type);
-    open = false;
+    // Don't close modal here - let parent handle it after API call succeeds
   }
 
   const filteredOptions = $derived(
@@ -305,8 +315,17 @@
       {/each}
     </div>
 
-    <Dialog.Footer>
-      <Button variant="outline" onclick={() => open = false}>
+    <Dialog.Footer class="flex-col sm:flex-row gap-2">
+      {#if error}
+        <p class="text-sm text-destructive flex-1">{error}</p>
+      {/if}
+      {#if loading}
+        <div class="flex items-center gap-2 text-sm text-muted-foreground">
+          <span class="animate-spin">⏳</span>
+          Building...
+        </div>
+      {/if}
+      <Button variant="outline" onclick={() => open = false} disabled={loading}>
         Cancel
       </Button>
     </Dialog.Footer>

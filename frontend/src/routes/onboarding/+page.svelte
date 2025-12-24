@@ -4,6 +4,23 @@
   import { Input } from '$lib/components/ui/input';
   import { Label } from '$lib/components/ui/label';
   import { goto } from '$app/navigation';
+  import { api } from '$lib/api/client';
+
+  interface CreateVillageResponse {
+    id: string;
+    name: string;
+    x: number;
+    y: number;
+    is_capital: boolean;
+  }
+
+  // Generate random coordinates for new village
+  function generateRandomCoordinates(): { x: number; y: number } {
+    // Random position within -200 to 200 range
+    const x = Math.floor(Math.random() * 401) - 200;
+    const y = Math.floor(Math.random() * 401) - 200;
+    return { x, y };
+  }
 
   type TribeCode = 'phasuttha' | 'nava' | 'kiri';
 
@@ -88,16 +105,27 @@
     error = '';
 
     try {
-      // TODO: Call API to create player
-      console.log('Creating player:', { name: playerName, tribe: selectedTribe });
+      // Generate random coordinates for the new village
+      const coords = generateRandomCoordinates();
 
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Create village via API
+      const village = await api.post<CreateVillageResponse>('/api/villages', {
+        name: playerName,
+        x: coords.x,
+        y: coords.y,
+      });
+
+      console.log('Village created:', village);
 
       // Redirect to village
       goto('/game/village');
     } catch (err: any) {
-      error = err.message || 'Failed to create player';
+      // Handle coordinate conflict - retry with new coordinates
+      if (err.message?.includes('Coordinates already occupied')) {
+        error = 'Location taken, please try again';
+      } else {
+        error = err.message || 'Failed to create village';
+      }
     } finally {
       loading = false;
     }

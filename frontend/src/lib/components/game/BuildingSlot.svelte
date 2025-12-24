@@ -20,6 +20,9 @@
     | 'cranny'
     | 'hero_mansion'
     | 'tavern'
+    | 'town_hall'
+    | 'treasury'
+    | 'trade_office'
     | 'woodcutter'
     | 'clay_pit'
     | 'iron_mine'
@@ -61,6 +64,9 @@
     cranny: '🕳️',
     hero_mansion: '🦸',
     tavern: '🍺',
+    town_hall: '🏛️',
+    treasury: '💰',
+    trade_office: '📊',
     woodcutter: '🪵',
     clay_pit: '🧱',
     iron_mine: '⛏️',
@@ -86,6 +92,9 @@
     cranny: 'Cranny',
     hero_mansion: 'Hero Mansion',
     tavern: 'Tavern',
+    town_hall: 'Town Hall',
+    treasury: 'Treasury',
+    trade_office: 'Trade Office',
     woodcutter: 'Woodcutter',
     clay_pit: 'Clay Pit',
     iron_mine: 'Iron Mine',

@@ -42,10 +42,15 @@
     error = '';
 
     try {
-      await authStore.loginWithGoogle();
+      const { hasVillage } = await authStore.loginWithGoogle();
       open = false;
-      // TODO: Check if user has player, redirect accordingly
-      goto('/onboarding');
+
+      // Redirect based on whether user has a village
+      if (hasVillage) {
+        goto('/game/village');
+      } else {
+        goto('/onboarding');
+      }
     } catch (err: any) {
       error = err.message || 'Google login failed';
     } finally {

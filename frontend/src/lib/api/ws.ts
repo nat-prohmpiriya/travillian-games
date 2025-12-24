@@ -34,7 +34,7 @@ class WebSocketClient {
         this.shouldReconnect = true;
         let token = '';
 
-        if (auth.currentUser) {
+        if (auth?.currentUser) {
             token = await auth.currentUser.getIdToken();
         }
 

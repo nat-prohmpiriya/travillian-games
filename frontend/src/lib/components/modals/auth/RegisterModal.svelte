@@ -54,9 +54,15 @@
     error = '';
 
     try {
-      await authStore.loginWithGoogle();
+      const { hasVillage } = await authStore.loginWithGoogle();
       open = false;
-      goto('/onboarding');
+
+      // Redirect based on whether user has a village
+      if (hasVillage) {
+        goto('/game/village');
+      } else {
+        goto('/onboarding');
+      }
     } catch (err: any) {
       error = err.message || 'Google sign up failed';
     } finally {

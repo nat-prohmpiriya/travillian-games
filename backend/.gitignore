@@ -23,6 +23,7 @@ Thumbs.db
 # Firebase credentials
 firebase-service-account.json
 *-service-account.json
+firebase-service-accountson.json
 
 # Debug
 debug/

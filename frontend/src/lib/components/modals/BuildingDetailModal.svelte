@@ -21,14 +21,32 @@
     time: number; // seconds
   }
 
+  interface VillageResources {
+    wood: number;
+    clay: number;
+    iron: number;
+    crop: number;
+  }
+
   interface Props {
     open: boolean;
     building: Building | null;
+    villageResources?: VillageResources;
     onUpgrade?: () => void;
     onDemolish?: () => void;
+    loading?: boolean;
+    error?: string;
   }
 
-  let { open = $bindable(false), building, onUpgrade, onDemolish }: Props = $props();
+  let { open = $bindable(false), building, villageResources, onUpgrade, onDemolish, loading = false, error = '' }: Props = $props();
+
+  // Use village resources if provided, otherwise fallback to mock data
+  const playerResources = $derived(villageResources || {
+    wood: 1250,
+    clay: 980,
+    iron: 750,
+    crop: 1100
+  });
 
   // Building metadata
   const buildingInfo: Record<BuildingType, {
@@ -55,6 +73,9 @@
     cranny: { name: 'Cranny', icon: '🕳️', description: 'Hide resources from enemy raids.', category: 'infrastructure' },
     hero_mansion: { name: 'Hero Mansion', icon: '🦸', description: 'House and manage your hero.', category: 'special' },
     tavern: { name: 'Tavern', icon: '🍺', description: 'Recruit special units and adventurers.', category: 'special' },
+    town_hall: { name: 'Town Hall', icon: '🏛️', description: 'Host celebrations and increase culture points.', category: 'special' },
+    treasury: { name: 'Treasury', icon: '💰', description: 'Store artifacts and increase their effect range.', category: 'special' },
+    trade_office: { name: 'Trade Office', icon: '📊', description: 'Manage trade routes and merchant operations.', category: 'infrastructure' },
     woodcutter: { name: 'Woodcutter', icon: '🪵', description: 'Produces wood. Higher levels increase production.', category: 'resource' },
     clay_pit: { name: 'Clay Pit', icon: '🧱', description: 'Produces clay. Higher levels increase production.', category: 'resource' },
     iron_mine: { name: 'Iron Mine', icon: '⛏️', description: 'Produces iron. Higher levels increase production.', category: 'resource' },
@@ -120,14 +141,6 @@
   const upgradeCost = $derived(building ? getUpgradeCost(building.type, building.level) : null);
   const production = $derived(building ? getProduction(building.type, building.level) : null);
   const nextProduction = $derived(building ? getProduction(building.type, building.level + 1) : null);
-
-  // Mock player resources for comparison
-  const playerResources = {
-    wood: 1250,
-    clay: 980,
-    iron: 750,
-    crop: 1100
-  };
 
   const canAfford = $derived(upgradeCost ? (
     playerResources.wood >= upgradeCost.wood &&
@@ -224,12 +237,19 @@
               <span class="font-medium">⏱️ {formatTime(upgradeCost.time)}</span>
             </div>
 
+            {#if error}
+              <p class="text-sm text-destructive mb-2">{error}</p>
+            {/if}
+
             <Button
               class="w-full"
-              disabled={!canAfford}
+              disabled={!canAfford || loading}
               onclick={onUpgrade}
             >
-              {#if canAfford}
+              {#if loading}
+                <span class="animate-spin mr-2">⏳</span>
+                Upgrading...
+              {:else if canAfford}
                 Upgrade to Level {building.level + 1}
               {:else}
                 Not enough resources
@@ -284,10 +304,14 @@
       </div>
 
       <Dialog.Footer class="flex-col sm:flex-row gap-2">
-        <Button variant="ghost" class="text-destructive" onclick={onDemolish}>
-          Demolish
+        <Button variant="ghost" class="text-destructive" onclick={onDemolish} disabled={loading}>
+          {#if loading}
+            Demolishing...
+          {:else}
+            Demolish
+          {/if}
         </Button>
-        <Button variant="outline" onclick={() => open = false}>
+        <Button variant="outline" onclick={() => open = false} disabled={loading}>
           Close
         </Button>
       </Dialog.Footer>
