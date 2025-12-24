@@ -3,6 +3,7 @@
   import { Button } from '$lib/components/ui/button';
   import { Card } from '$lib/components/ui/card';
   import { Separator } from '$lib/components/ui/separator';
+  import RallyPointModal from './RallyPointModal.svelte';
   import type { BuildingType } from '$lib/components/game/BuildingSlot.svelte';
 
   interface Building {
@@ -31,6 +32,9 @@
   interface Props {
     open: boolean;
     building: Building | null;
+    villageId?: string;
+    villageX?: number;
+    villageY?: number;
     villageResources?: VillageResources;
     onUpgrade?: () => void;
     onDemolish?: () => void;
@@ -39,7 +43,27 @@
     error?: string;
   }
 
-  let { open = $bindable(false), building, villageResources, onUpgrade, onDemolish, onTrainTroops, loading = false, error = '' }: Props = $props();
+  let {
+    open = $bindable(false),
+    building,
+    villageId = '',
+    villageX = 0,
+    villageY = 0,
+    villageResources,
+    onUpgrade,
+    onDemolish,
+    onTrainTroops,
+    loading = false,
+    error = ''
+  }: Props = $props();
+
+  // Rally Point modal state
+  let rallyPointOpen = $state(false);
+
+  function openRallyPoint() {
+    open = false; // Close building detail modal
+    rallyPointOpen = true; // Open rally point modal
+  }
 
   // Use village resources if provided, otherwise fallback to mock data
   const playerResources = $derived(villageResources || {
@@ -278,13 +302,9 @@
         {#if info.category === 'military' && building.type === 'rally_point'}
           <Separator />
           <div class="space-y-2">
-            <Button variant="outline" class="w-full gap-2">
+            <Button variant="outline" class="w-full gap-2" onclick={openRallyPoint}>
               <span>⚔️</span>
-              Send Attack
-            </Button>
-            <Button variant="outline" class="w-full gap-2">
-              <span>🛡️</span>
-              Send Reinforcement
+              Send Army
             </Button>
           </div>
         {/if}
@@ -319,3 +339,11 @@
     {/if}
   </Dialog.Content>
 </Dialog.Root>
+
+<!-- Rally Point Modal -->
+<RallyPointModal
+  bind:open={rallyPointOpen}
+  {villageId}
+  {villageX}
+  {villageY}
+/>

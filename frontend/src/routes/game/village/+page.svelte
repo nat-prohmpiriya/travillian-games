@@ -466,6 +466,9 @@
     isUpgrading: selectedBuilding.is_upgrading,
     upgradeEndsAt: selectedBuilding.upgrade_ends_at ? new Date(selectedBuilding.upgrade_ends_at) : undefined,
   } : null}
+  villageId={currentVillage?.id || ''}
+  villageX={currentVillage?.x || 0}
+  villageY={currentVillage?.y || 0}
   villageResources={currentVillage ? {
     wood: currentVillage.wood,
     clay: currentVillage.clay,
