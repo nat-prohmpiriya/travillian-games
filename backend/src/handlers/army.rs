@@ -7,7 +7,7 @@ use uuid::Uuid;
 
 use crate::error::{AppError, AppResult};
 use crate::middleware::AuthenticatedUser;
-use crate::models::army::{ArmyResponse, BattleReportResponse, SendArmyRequest};
+use crate::models::army::{ArmyResponse, BattleReportResponse, ScoutReportResponse, SendArmyRequest};
 use crate::repositories::army_repo::ArmyRepository;
 use crate::repositories::user_repo::UserRepository;
 use crate::repositories::village_repo::VillageRepository;
@@ -153,7 +153,7 @@ pub async fn mark_report_read(
     })))
 }
 
-// GET /api/reports/unread-count - Get unread report count
+// GET /api/reports/unread-count - Get unread report count (battle + scout)
 pub async fn get_unread_count(
     State(state): State<AppState>,
     Extension(auth_user): Extension<AuthenticatedUser>,
@@ -162,9 +162,75 @@ pub async fn get_unread_count(
         .await?
         .ok_or(AppError::Unauthorized)?;
 
-    let count = ArmyRepository::count_unread_reports(&state.db, user.id).await?;
+    let count = ArmyService::get_total_unread_count(&state.db, user.id).await?;
 
     Ok(Json(serde_json::json!({
         "unread_count": count
+    })))
+}
+
+// ==================== Scout Reports ====================
+
+// GET /api/scout-reports - List scout reports
+pub async fn list_scout_reports(
+    State(state): State<AppState>,
+    Extension(auth_user): Extension<AuthenticatedUser>,
+) -> AppResult<Json<Vec<ScoutReportResponse>>> {
+    let user = UserRepository::find_by_firebase_uid(&state.db, &auth_user.firebase_uid)
+        .await?
+        .ok_or(AppError::Unauthorized)?;
+
+    let reports = ArmyService::get_scout_reports(&state.db, user.id).await?;
+
+    let responses: Vec<ScoutReportResponse> = reports
+        .into_iter()
+        .map(|r| {
+            let is_attacker = r.attacker_player_id == user.id;
+            r.to_response(is_attacker)
+        })
+        .collect();
+
+    Ok(Json(responses))
+}
+
+// GET /api/scout-reports/:report_id - Get single scout report
+pub async fn get_scout_report(
+    State(state): State<AppState>,
+    Extension(auth_user): Extension<AuthenticatedUser>,
+    Path(report_id): Path<Uuid>,
+) -> AppResult<Json<ScoutReportResponse>> {
+    let user = UserRepository::find_by_firebase_uid(&state.db, &auth_user.firebase_uid)
+        .await?
+        .ok_or(AppError::Unauthorized)?;
+
+    let report = ArmyService::get_scout_report(&state.db, report_id)
+        .await?
+        .ok_or_else(|| AppError::NotFound("Scout report not found".to_string()))?;
+
+    // Check if user is involved
+    let is_attacker = report.attacker_player_id == user.id;
+    let is_defender = report.defender_player_id == Some(user.id);
+
+    if !is_attacker && !is_defender {
+        return Err(AppError::Forbidden);
+    }
+
+    Ok(Json(report.to_response(is_attacker)))
+}
+
+// POST /api/scout-reports/:report_id/read - Mark scout report as read
+pub async fn mark_scout_report_read(
+    State(state): State<AppState>,
+    Extension(auth_user): Extension<AuthenticatedUser>,
+    Path(report_id): Path<Uuid>,
+) -> AppResult<Json<serde_json::Value>> {
+    let user = UserRepository::find_by_firebase_uid(&state.db, &auth_user.firebase_uid)
+        .await?
+        .ok_or(AppError::Unauthorized)?;
+
+    ArmyService::mark_scout_report_read(&state.db, report_id, user.id).await?;
+
+    Ok(Json(serde_json::json!({
+        "message": "Scout report marked as read"
     })))
 }

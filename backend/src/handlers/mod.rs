@@ -16,6 +16,7 @@ pub fn routes(state: AppState) -> Router<AppState> {
         .nest("/map", map_routes(state.clone()))
         .nest("/troops", troop_routes(state.clone()))
         .nest("/reports", report_routes(state.clone()))
+        .nest("/scout-reports", scout_report_routes(state.clone()))
         // Public routes (no auth required)
         .merge(public_routes())
 }
@@ -77,5 +78,13 @@ fn report_routes(state: AppState) -> Router<AppState> {
         .route("/unread-count", get(army::get_unread_count))
         .route("/{report_id}", get(army::get_report))
         .route("/{report_id}/read", post(army::mark_report_read))
+        .route_layer(middleware::from_fn_with_state(state, auth_middleware))
+}
+
+fn scout_report_routes(state: AppState) -> Router<AppState> {
+    Router::new()
+        .route("/", get(army::list_scout_reports))
+        .route("/{report_id}", get(army::get_scout_report))
+        .route("/{report_id}/read", post(army::mark_scout_report_read))
         .route_layer(middleware::from_fn_with_state(state, auth_middleware))
 }
