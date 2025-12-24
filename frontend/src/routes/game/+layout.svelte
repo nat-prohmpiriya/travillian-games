@@ -6,9 +6,11 @@
   import { Button } from '$lib/components/ui/button';
   import ResourceBar from '$lib/components/game/ResourceBar.svelte';
   import LanguageSwitcher from '$lib/components/LanguageSwitcher.svelte';
+  import ReportsModal from '$lib/components/modals/ReportsModal.svelte';
   import { page } from '$app/state';
   import { goto } from '$app/navigation';
   import { villageStore } from '$lib/stores/village';
+  import { armyStore } from '$lib/stores/army';
   import { wsClient, wsState } from '$lib/api/ws';
 
   let { children }: { children: Snippet } = $props();
@@ -23,6 +25,11 @@
   let wsConnected = $derived($wsConnState.connected);
 
   let selectedVillageId = $state('');
+
+  // Reports modal state
+  let reportsModalOpen = $state(false);
+  let armyState = $state(armyStore);
+  let unreadReportsCount = $derived($armyState.unreadCount);
 
   // Convert village data to ResourceBar format
   const resources = $derived(currentVillage ? {
@@ -91,6 +98,9 @@
         } else if (currentVillage) {
           selectedVillageId = currentVillage.id;
         }
+
+        // Load unread reports count
+        armyStore.loadUnreadCount();
 
         // Connect WebSocket
         await wsClient.connect();
@@ -195,12 +205,19 @@
         <!-- Language Switcher -->
         <LanguageSwitcher />
 
+        <!-- Reports -->
+        <Button variant="ghost" size="icon" class="relative" onclick={() => reportsModalOpen = true}>
+          <span class="text-lg">📜</span>
+          {#if unreadReportsCount > 0}
+            <span class="absolute -top-1 -right-1 w-4 h-4 bg-destructive text-destructive-foreground text-xs rounded-full flex items-center justify-center">
+              {unreadReportsCount > 9 ? '9+' : unreadReportsCount}
+            </span>
+          {/if}
+        </Button>
+
         <!-- Notifications -->
         <Button variant="ghost" size="icon" class="relative">
           <span class="text-lg">🔔</span>
-          <span class="absolute -top-1 -right-1 w-4 h-4 bg-destructive text-destructive-foreground text-xs rounded-full flex items-center justify-center">
-            3
-          </span>
         </Button>
 
         <!-- Profile -->
@@ -236,9 +253,17 @@
         <span class="text-xl">⚔️</span>
         <span>{$t('army.send')}</span>
       </button>
-      <button class="flex flex-col items-center gap-1 px-4 py-2 text-xs text-muted-foreground">
+      <button
+        class="flex flex-col items-center gap-1 px-4 py-2 text-xs text-muted-foreground relative"
+        onclick={() => reportsModalOpen = true}
+      >
         <span class="text-xl">📜</span>
         <span>{$t('nav.reports')}</span>
+        {#if unreadReportsCount > 0}
+          <span class="absolute top-1 right-2 w-4 h-4 bg-destructive text-destructive-foreground text-xs rounded-full flex items-center justify-center">
+            {unreadReportsCount > 9 ? '9+' : unreadReportsCount}
+          </span>
+        {/if}
       </button>
     </div>
   </nav>
@@ -246,3 +271,6 @@
   <!-- Spacer for mobile bottom nav -->
   <div class="md:hidden h-14"></div>
 </div>
+
+<!-- Reports Modal -->
+<ReportsModal bind:open={reportsModalOpen} />
