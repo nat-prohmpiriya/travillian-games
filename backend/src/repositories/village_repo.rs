@@ -321,4 +321,51 @@ impl VillageRepository {
 
         Ok(village)
     }
+
+    // ==================== Conquer-related ====================
+
+    pub async fn update_loyalty(pool: &PgPool, id: Uuid, loyalty: i32) -> AppResult<Village> {
+        let village = sqlx::query_as::<_, Village>(
+            r#"
+            UPDATE villages
+            SET loyalty = $2,
+                updated_at = NOW()
+            WHERE id = $1
+            RETURNING id, user_id, name, x, y, is_capital,
+                      wood, clay, iron, crop,
+                      warehouse_capacity, granary_capacity,
+                      population, culture_points, loyalty,
+                      resources_updated_at, created_at, updated_at
+            "#,
+        )
+        .bind(id)
+        .bind(loyalty)
+        .fetch_one(pool)
+        .await?;
+
+        Ok(village)
+    }
+
+    pub async fn transfer_ownership(pool: &PgPool, id: Uuid, new_owner_id: Uuid) -> AppResult<Village> {
+        let village = sqlx::query_as::<_, Village>(
+            r#"
+            UPDATE villages
+            SET user_id = $2,
+                is_capital = false,
+                updated_at = NOW()
+            WHERE id = $1
+            RETURNING id, user_id, name, x, y, is_capital,
+                      wood, clay, iron, crop,
+                      warehouse_capacity, granary_capacity,
+                      population, culture_points, loyalty,
+                      resources_updated_at, created_at, updated_at
+            "#,
+        )
+        .bind(id)
+        .bind(new_owner_id)
+        .fetch_one(pool)
+        .await?;
+
+        Ok(village)
+    }
 }

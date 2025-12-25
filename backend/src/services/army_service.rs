@@ -33,14 +33,26 @@ impl ArmyService {
         from_village_id: Uuid,
         request: SendArmyRequest,
     ) -> AppResult<ArmyResponse> {
-        // Validate mission type (MVP: Raid, Attack, Scout, and Support)
+        // Validate mission type
         if !matches!(
             request.mission,
-            MissionType::Raid | MissionType::Attack | MissionType::Scout | MissionType::Support
+            MissionType::Raid | MissionType::Attack | MissionType::Scout | MissionType::Support | MissionType::Conquer
         ) {
             return Err(AppError::BadRequest(
-                "Only Raid, Attack, Scout, and Support missions are currently supported".into(),
+                "Only Raid, Attack, Scout, Support, and Conquer missions are currently supported".into(),
             ));
+        }
+
+        // Conquer mission requires at least one Chief troop
+        if request.mission == MissionType::Conquer {
+            let has_chief = request.troops.iter().any(|(troop_type, count)| {
+                *count > 0 && troop_type.is_chief()
+            });
+            if !has_chief {
+                return Err(AppError::BadRequest(
+                    "Conquer mission requires at least one Chief unit (Royal Advisor, Harbor Master, or Elder Chief)".into(),
+                ));
+            }
         }
 
         // Get source village
@@ -165,6 +177,9 @@ impl ArmyService {
                     }
                     MissionType::Support => {
                         Self::handle_support_arrival(pool, &army).await
+                    }
+                    MissionType::Conquer => {
+                        Self::handle_conquer_arrival(pool, &army).await
                     }
                     _ => {
                         // Other mission types not implemented yet
@@ -546,6 +561,214 @@ impl ArmyService {
             army.to_y,
             army.troops.0.values().sum::<i32>()
         );
+
+        Ok(())
+    }
+
+    /// Handle conquer mission arrival at target village
+    /// Similar to attack, but also reduces loyalty if attacker wins with surviving Chiefs
+    async fn handle_conquer_arrival(pool: &PgPool, army: &Army) -> AppResult<()> {
+        let definitions = TroopRepository::get_all_definitions(pool).await?;
+
+        // Get target village
+        let target_village = if let Some(village_id) = army.to_village_id {
+            VillageRepository::find_by_id(pool, village_id).await?
+        } else {
+            VillageRepository::find_by_coordinates(pool, army.to_x, army.to_y).await?
+        };
+
+        // If no target village, army just returns
+        let Some(target) = target_village else {
+            info!("Conquer army {} arrived at empty tile, returning home", army.id);
+            return Self::initiate_return(
+                pool,
+                army,
+                army.troops.0.clone(),
+                CarriedResources::default(),
+                None,
+            )
+            .await;
+        };
+
+        // Can't conquer own village
+        if target.user_id == army.player_id {
+            info!("Conquer army {} cannot conquer own village, returning home", army.id);
+            return Self::initiate_return(
+                pool,
+                army,
+                army.troops.0.clone(),
+                CarriedResources::default(),
+                None,
+            )
+            .await;
+        }
+
+        // Can't conquer capital
+        if target.is_capital {
+            info!("Conquer army {} cannot conquer capital, returning home", army.id);
+            return Self::initiate_return(
+                pool,
+                army,
+                army.troops.0.clone(),
+                CarriedResources::default(),
+                None,
+            )
+            .await;
+        }
+
+        // Get defender troops (village's own troops + stationed support)
+        let defender_troops_list = TroopRepository::find_by_village(pool, target.id).await?;
+        let village_troops: ArmyTroops = defender_troops_list
+            .iter()
+            .filter(|t| t.in_village > 0)
+            .map(|t| (t.troop_type, t.in_village))
+            .collect();
+
+        let stationed_armies = ArmyRepository::find_stationed_at_village(pool, target.id).await?;
+        let mut total_defender_troops = village_troops.clone();
+        for stationed in &stationed_armies {
+            for (troop_type, count) in stationed.troops.0.iter() {
+                *total_defender_troops.entry(*troop_type).or_insert(0) += count;
+            }
+        }
+
+        // Calculate battle (similar to Attack mission)
+        let battle = Self::calculate_battle(
+            &army.troops.0,
+            &total_defender_troops,
+            &definitions,
+            MissionType::Attack, // Use Attack calculation for combat
+        );
+
+        // Apply defender losses (same as handle_hostile_arrival)
+        for (troop_type, total_losses) in &battle.defender_losses {
+            let village_count = village_troops.get(troop_type).copied().unwrap_or(0);
+            let total_count = total_defender_troops.get(troop_type).copied().unwrap_or(0);
+
+            if total_count > 0 && village_count > 0 {
+                let village_losses = ((*total_losses as f64) * (village_count as f64 / total_count as f64)).ceil() as i32;
+                let actual_losses = village_losses.min(village_count);
+                if actual_losses > 0 {
+                    TroopRepository::kill_troops(pool, target.id, *troop_type, actual_losses)
+                        .await?;
+                }
+            }
+        }
+
+        // Apply losses to stationed support troops
+        for stationed in &stationed_armies {
+            let mut stationed_survivors = stationed.troops.0.clone();
+            let mut had_losses = false;
+
+            for (troop_type, total_losses) in &battle.defender_losses {
+                let stationed_count = stationed.troops.0.get(troop_type).copied().unwrap_or(0);
+                let total_count = total_defender_troops.get(troop_type).copied().unwrap_or(0);
+
+                if total_count > 0 && stationed_count > 0 {
+                    let stationed_losses = ((*total_losses as f64) * (stationed_count as f64 / total_count as f64)).ceil() as i32;
+                    let actual_losses = stationed_losses.min(stationed_count);
+                    if actual_losses > 0 {
+                        had_losses = true;
+                        let remaining = stationed_count - actual_losses;
+                        if remaining > 0 {
+                            stationed_survivors.insert(*troop_type, remaining);
+                        } else {
+                            stationed_survivors.remove(troop_type);
+                        }
+                    }
+                }
+            }
+
+            if had_losses {
+                ArmyRepository::update_stationed_troops(pool, stationed.id, &stationed_survivors)
+                    .await?;
+            }
+        }
+
+        // Calculate loyalty reduction if attacker won and has surviving Chiefs
+        let mut loyalty_reduced = 0;
+        let mut village_conquered = false;
+
+        if battle.attacker_wins {
+            // Calculate loyalty reduction from surviving Chiefs
+            for (troop_type, count) in &battle.attacker_survivors {
+                if *count > 0 && troop_type.is_chief() {
+                    if let Some(def) = definitions.iter().find(|d| d.troop_type == *troop_type) {
+                        loyalty_reduced += def.loyalty_reduction * count;
+                    }
+                }
+            }
+
+            if loyalty_reduced > 0 {
+                let new_loyalty = (target.loyalty - loyalty_reduced).max(0);
+                VillageRepository::update_loyalty(pool, target.id, new_loyalty).await?;
+
+                info!(
+                    "Conquer at ({}, {}): Loyalty reduced by {} (was {}, now {})",
+                    army.to_x, army.to_y, loyalty_reduced, target.loyalty, new_loyalty
+                );
+
+                // Check if village is conquered (loyalty <= 0)
+                if new_loyalty <= 0 {
+                    // Transfer village ownership
+                    VillageRepository::transfer_ownership(pool, target.id, army.player_id).await?;
+                    // Reset loyalty to 25% (so it can be defended)
+                    VillageRepository::update_loyalty(pool, target.id, 25).await?;
+                    village_conquered = true;
+
+                    info!(
+                        "Village {} at ({}, {}) conquered by player {}!",
+                        target.name, army.to_x, army.to_y, army.player_id
+                    );
+                }
+            }
+        }
+
+        // Create battle report
+        let winner = if battle.attacker_wins {
+            "attacker"
+        } else if battle.defender_survivors.values().sum::<i32>() > 0 {
+            "defender"
+        } else {
+            "draw"
+        };
+
+        let report = ArmyRepository::create_battle_report(
+            pool,
+            army.player_id,
+            Some(target.user_id),
+            army.from_village_id,
+            Some(target.id),
+            MissionType::Conquer,
+            &army.troops.0,
+            &total_defender_troops,
+            &battle.attacker_losses,
+            &battle.defender_losses,
+            &CarriedResources::default(), // No resources stolen in conquer
+            winner,
+            Utc::now(),
+        )
+        .await?;
+
+        info!(
+            "Conquer battle at ({}, {}): {} wins! Loyalty: -{}, Conquered: {}",
+            army.to_x, army.to_y, winner, loyalty_reduced, village_conquered
+        );
+
+        // Initiate return journey if there are survivors
+        let total_survivors: i32 = battle.attacker_survivors.values().sum();
+        if total_survivors > 0 {
+            Self::initiate_return(
+                pool,
+                army,
+                battle.attacker_survivors,
+                CarriedResources::default(),
+                Some(report.id),
+            )
+            .await?;
+        } else {
+            ArmyRepository::delete(pool, army.id).await?;
+        }
 
         Ok(())
     }

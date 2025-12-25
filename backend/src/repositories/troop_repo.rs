@@ -17,7 +17,7 @@ impl TroopRepository {
                    attack, defense_infantry, defense_cavalry, speed,
                    carry_capacity, crop_consumption, training_time_seconds,
                    wood_cost, clay_cost, iron_cost, crop_cost,
-                   required_building, required_building_level, created_at
+                   required_building, required_building_level, loyalty_reduction, created_at
             FROM troop_definitions
             ORDER BY tribe, troop_type
             "#,
@@ -35,7 +35,7 @@ impl TroopRepository {
                    attack, defense_infantry, defense_cavalry, speed,
                    carry_capacity, crop_consumption, training_time_seconds,
                    wood_cost, clay_cost, iron_cost, crop_cost,
-                   required_building, required_building_level, created_at
+                   required_building, required_building_level, loyalty_reduction, created_at
             FROM troop_definitions
             WHERE troop_type = $1
             "#,

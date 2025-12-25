@@ -11,6 +11,7 @@
         type Troop,
         type TroopDefinition,
         type TroopType,
+        isChiefTroop,
     } from '$lib/stores/troop';
     import {
         armyStore,
@@ -141,11 +142,26 @@
         }, 0)
     );
 
+    // Check if any Chief troops are selected
+    const hasChiefSelected = $derived(
+        Object.entries(selectedTroops).some(([type, count]) =>
+            count > 0 && isChiefTroop(type as TroopType)
+        )
+    );
+
+    // Conquer validation error
+    const conquerError = $derived(
+        mission === 'conquer' && !hasChiefSelected
+            ? 'Conquer mission requires at least one Chief unit (Royal Advisor, Harbor Master, or Elder Chief)'
+            : null
+    );
+
     // Validate form
     const isValid = $derived(
         totalTroops > 0 &&
         (toX !== villageX || toY !== villageY) &&
-        !loading
+        !loading &&
+        !conquerError
     );
 
     // Handle send army
@@ -172,12 +188,13 @@
         }
     }
 
-    // Mission options (Raid, Attack, Scout, and Support)
+    // Mission options
     const missionOptions: { type: MissionType; enabled: boolean }[] = [
         { type: 'raid', enabled: true },
         { type: 'attack', enabled: true },
         { type: 'scout', enabled: true },
         { type: 'support', enabled: true },
+        { type: 'conquer', enabled: true },
     ];
 </script>
 
@@ -237,7 +254,7 @@
                 <!-- Mission Type -->
                 <div>
                     <Label class="text-sm font-medium mb-2 block">Mission Type</Label>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                    <div class="grid grid-cols-2 md:grid-cols-5 gap-2">
                         {#each missionOptions as opt}
                             <Button
                                 variant={mission === opt.type ? 'default' : 'outline'}
@@ -259,8 +276,13 @@
                             Reconnaissance mission to gather information.
                         {:else if mission === 'support'}
                             Send troops to defend an allied village.
+                        {:else if mission === 'conquer'}
+                            Capture enemy village. Requires Chief unit to reduce loyalty.
                         {/if}
                     </p>
+                    {#if conquerError}
+                        <p class="text-xs text-destructive mt-1">⚠️ {conquerError}</p>
+                    {/if}
                 </div>
 
                 <Separator />

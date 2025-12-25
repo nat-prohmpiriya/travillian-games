@@ -19,7 +19,11 @@ export type TroopType =
     | 'swamp_dragon'
     | 'locust_swarm'
     | 'battle_duck'
-    | 'portuguese_musketeer';
+    | 'portuguese_musketeer'
+    // Chief units (can reduce loyalty)
+    | 'royal_advisor'
+    | 'harbor_master'
+    | 'elder_chief';
 
 export type TribeType = 'phasuttha' | 'nava' | 'kiri' | 'special';
 
@@ -41,6 +45,7 @@ export interface TroopDefinition {
     crop_cost: number;
     required_building: string;
     required_building_level: number;
+    loyalty_reduction: number;
 }
 
 export interface Troop {
@@ -253,6 +258,10 @@ export function getTroopIcon(type: TroopType): string {
         locust_swarm: '🦗',
         battle_duck: '🦆',
         portuguese_musketeer: '🔫',
+        // Chief units
+        royal_advisor: '👑',
+        harbor_master: '⚓',
+        elder_chief: '🧙',
     };
     return icons[type] || '👤';
 }
@@ -283,4 +292,9 @@ export function formatTime(seconds: number): string {
 
 export function getDefinitionByType(definitions: TroopDefinition[], type: TroopType): TroopDefinition | undefined {
     return definitions.find(d => d.troop_type === type);
+}
+
+// Chief troops can reduce village loyalty during Conquer missions
+export function isChiefTroop(type: TroopType): boolean {
+    return type === 'royal_advisor' || type === 'harbor_master' || type === 'elder_chief';
 }

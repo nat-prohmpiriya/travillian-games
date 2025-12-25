@@ -29,6 +29,10 @@ pub enum TroopType {
     LocustSwarm,
     BattleDuck,
     PortugueseMusketeer,
+    // Chief units (can reduce loyalty)
+    RoyalAdvisor,
+    HarborMaster,
+    ElderChief,
 }
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, sqlx::Type, PartialEq)]
@@ -44,9 +48,9 @@ pub enum TribeType {
 impl TroopType {
     pub fn tribe(&self) -> TribeType {
         match self {
-            TroopType::Infantry | TroopType::Spearman | TroopType::WarElephant | TroopType::BuffaloWagon => TribeType::Phasuttha,
-            TroopType::KrisWarrior | TroopType::SeaDiver | TroopType::WarPrahu | TroopType::MerchantShip => TribeType::Nava,
-            TroopType::Crossbowman | TroopType::MountainWarrior | TroopType::HighlandPony | TroopType::TrapMaker => TribeType::Kiri,
+            TroopType::Infantry | TroopType::Spearman | TroopType::WarElephant | TroopType::BuffaloWagon | TroopType::RoyalAdvisor => TribeType::Phasuttha,
+            TroopType::KrisWarrior | TroopType::SeaDiver | TroopType::WarPrahu | TroopType::MerchantShip | TroopType::HarborMaster => TribeType::Nava,
+            TroopType::Crossbowman | TroopType::MountainWarrior | TroopType::HighlandPony | TroopType::TrapMaker | TroopType::ElderChief => TribeType::Kiri,
             _ => TribeType::Special,
         }
     }
@@ -64,6 +68,14 @@ impl TroopType {
 
     pub fn is_infantry(&self) -> bool {
         !self.is_cavalry()
+    }
+
+    /// Check if this troop type is a Chief (can reduce loyalty)
+    pub fn is_chief(&self) -> bool {
+        matches!(
+            self,
+            TroopType::RoyalAdvisor | TroopType::HarborMaster | TroopType::ElderChief
+        )
     }
 }
 
@@ -91,6 +103,8 @@ pub struct TroopDefinition {
     // Requirements
     pub required_building: BuildingType,
     pub required_building_level: i32,
+    // Conquer ability
+    pub loyalty_reduction: i32,
     pub created_at: DateTime<Utc>,
 }
 
@@ -203,6 +217,7 @@ pub struct TroopDefinitionResponse {
     pub crop_cost: i32,
     pub required_building: BuildingType,
     pub required_building_level: i32,
+    pub loyalty_reduction: i32,
 }
 
 impl From<TroopDefinition> for TroopDefinitionResponse {
@@ -225,6 +240,7 @@ impl From<TroopDefinition> for TroopDefinitionResponse {
             crop_cost: d.crop_cost,
             required_building: d.required_building,
             required_building_level: d.required_building_level,
+            loyalty_reduction: d.loyalty_reduction,
         }
     }
 }
