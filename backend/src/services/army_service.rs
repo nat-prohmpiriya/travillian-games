@@ -33,13 +33,13 @@ impl ArmyService {
         from_village_id: Uuid,
         request: SendArmyRequest,
     ) -> AppResult<ArmyResponse> {
-        // Validate mission type (MVP: Raid, Attack, and Scout)
+        // Validate mission type (MVP: Raid, Attack, Scout, and Support)
         if !matches!(
             request.mission,
-            MissionType::Raid | MissionType::Attack | MissionType::Scout
+            MissionType::Raid | MissionType::Attack | MissionType::Scout | MissionType::Support
         ) {
             return Err(AppError::BadRequest(
-                "Only Raid, Attack, and Scout missions are currently supported".into(),
+                "Only Raid, Attack, Scout, and Support missions are currently supported".into(),
             ));
         }
 
@@ -81,11 +81,16 @@ impl ArmyService {
         // Get target village (if exists)
         let target_village = VillageRepository::find_by_coordinates(pool, request.to_x, request.to_y).await?;
 
-        // Can't attack own village
+        // Can't attack own village (but can support own village)
         if let Some(ref target) = target_village {
-            if target.user_id == player_id {
+            if target.user_id == player_id && request.mission.is_hostile() {
                 return Err(AppError::BadRequest("Cannot attack your own village".into()));
             }
+        }
+
+        // Support mission requires a target village
+        if request.mission == MissionType::Support && target_village.is_none() {
+            return Err(AppError::BadRequest("Support mission requires a target village".into()));
         }
 
         // Get troop definitions for travel time calculation
@@ -158,6 +163,9 @@ impl ArmyService {
                     MissionType::Scout => {
                         Self::handle_scout_arrival(pool, &army).await
                     }
+                    MissionType::Support => {
+                        Self::handle_support_arrival(pool, &army).await
+                    }
                     _ => {
                         // Other mission types not implemented yet
                         error!("Unhandled mission type: {:?}", army.mission);
@@ -202,26 +210,83 @@ impl ArmyService {
             .await;
         };
 
-        // Get defender troops
+        // Get defender troops (village's own troops)
         let defender_troops_list = TroopRepository::find_by_village(pool, target.id).await?;
-        let defender_troops: ArmyTroops = defender_troops_list
+        let village_troops: ArmyTroops = defender_troops_list
             .iter()
             .filter(|t| t.in_village > 0)
             .map(|t| (t.troop_type, t.in_village))
             .collect();
 
-        // Calculate battle
+        // Get stationed support troops at this village
+        let stationed_armies = ArmyRepository::find_stationed_at_village(pool, target.id).await?;
+
+        // Combine village troops with stationed support troops for total defense
+        let mut total_defender_troops = village_troops.clone();
+        for stationed in &stationed_armies {
+            for (troop_type, count) in stationed.troops.0.iter() {
+                *total_defender_troops.entry(*troop_type).or_insert(0) += count;
+            }
+        }
+
+        // Calculate battle with combined defense
         let battle = Self::calculate_battle(
             &army.troops.0,
-            &defender_troops,
+            &total_defender_troops,
             &definitions,
             army.mission,
         );
 
-        // Apply defender losses (troops killed in battle)
-        for (troop_type, losses) in &battle.defender_losses {
-            if *losses > 0 {
-                TroopRepository::kill_troops(pool, target.id, *troop_type, *losses)
+        // Apply losses to village's own troops
+        let village_loss_ratio = if total_defender_troops.values().sum::<i32>() > 0 {
+            village_troops.values().sum::<i32>() as f64
+                / total_defender_troops.values().sum::<i32>() as f64
+        } else {
+            1.0
+        };
+
+        for (troop_type, total_losses) in &battle.defender_losses {
+            // Calculate village's share of losses
+            let village_count = village_troops.get(troop_type).copied().unwrap_or(0);
+            let total_count = total_defender_troops.get(troop_type).copied().unwrap_or(0);
+
+            if total_count > 0 && village_count > 0 {
+                let village_losses = ((*total_losses as f64) * (village_count as f64 / total_count as f64)).ceil() as i32;
+                let actual_losses = village_losses.min(village_count);
+                if actual_losses > 0 {
+                    TroopRepository::kill_troops(pool, target.id, *troop_type, actual_losses)
+                        .await?;
+                }
+            }
+        }
+
+        // Apply losses to stationed support troops
+        for stationed in &stationed_armies {
+            let mut stationed_survivors = stationed.troops.0.clone();
+            let mut had_losses = false;
+
+            for (troop_type, total_losses) in &battle.defender_losses {
+                let stationed_count = stationed.troops.0.get(troop_type).copied().unwrap_or(0);
+                let total_count = total_defender_troops.get(troop_type).copied().unwrap_or(0);
+
+                if total_count > 0 && stationed_count > 0 {
+                    let stationed_losses = ((*total_losses as f64) * (stationed_count as f64 / total_count as f64)).ceil() as i32;
+                    let actual_losses = stationed_losses.min(stationed_count);
+                    if actual_losses > 0 {
+                        had_losses = true;
+                        let remaining = stationed_count - actual_losses;
+                        if remaining > 0 {
+                            stationed_survivors.insert(*troop_type, remaining);
+                        } else {
+                            stationed_survivors.remove(troop_type);
+                        }
+                    }
+                }
+            }
+
+            // Update stationed army with survivors (or delete if all dead)
+            if had_losses {
+                ArmyRepository::update_stationed_troops(pool, stationed.id, &stationed_survivors)
                     .await?;
             }
         }
@@ -246,7 +311,7 @@ impl ArmyService {
             .await?;
         }
 
-        // Create battle report
+        // Create battle report (show total defender troops including support)
         let winner = if battle.attacker_wins {
             "attacker"
         } else if battle.defender_survivors.values().sum::<i32>() > 0 {
@@ -263,7 +328,7 @@ impl ArmyService {
             Some(target.id),
             army.mission,
             &army.troops.0,
-            &defender_troops,
+            &total_defender_troops,
             &battle.attacker_losses,
             &battle.defender_losses,
             &stolen_resources,
@@ -273,10 +338,11 @@ impl ArmyService {
         .await?;
 
         info!(
-            "Battle at ({}, {}): {} wins! Attacker lost {:?}, Defender lost {:?}",
+            "Battle at ({}, {}): {} wins! Attacker lost {:?}, Defender lost {:?} (including {} support armies)",
             army.to_x, army.to_y, winner,
             battle.attacker_losses.values().sum::<i32>(),
-            battle.defender_losses.values().sum::<i32>()
+            battle.defender_losses.values().sum::<i32>(),
+            stationed_armies.len()
         );
 
         // Initiate return journey if there are survivors
@@ -441,6 +507,45 @@ impl ArmyService {
             // All scouts dead
             ArmyRepository::delete(pool, army.id).await?;
         }
+
+        Ok(())
+    }
+
+    /// Handle support mission arrival at target village
+    async fn handle_support_arrival(pool: &PgPool, army: &Army) -> AppResult<()> {
+        // Get target village
+        let target_village = if let Some(village_id) = army.to_village_id {
+            VillageRepository::find_by_id(pool, village_id).await?
+        } else {
+            VillageRepository::find_by_coordinates(pool, army.to_x, army.to_y).await?
+        };
+
+        // If no target village exists, troops return home
+        let Some(_target) = target_village else {
+            info!(
+                "Support army {} arrived at empty tile ({}, {}), returning home",
+                army.id, army.to_x, army.to_y
+            );
+            return Self::initiate_return(
+                pool,
+                army,
+                army.troops.0.clone(),
+                CarriedResources::default(),
+                None,
+            )
+            .await;
+        };
+
+        // Mark army as stationed at target village
+        ArmyRepository::set_stationed(pool, army.id).await?;
+
+        info!(
+            "Support army {} is now stationed at ({}, {}) with {} troops",
+            army.id,
+            army.to_x,
+            army.to_y,
+            army.troops.0.values().sum::<i32>()
+        );
 
         Ok(())
     }
@@ -862,5 +967,68 @@ impl ArmyService {
         let battle_count = ArmyRepository::count_unread_reports(pool, player_id).await?;
         let scout_count = ArmyRepository::count_unread_scout_reports(pool, player_id).await?;
         Ok(battle_count + scout_count)
+    }
+
+    // ==================== Support/Stationed Troops ====================
+
+    /// Get troops stationed at a village (support from allies)
+    pub async fn get_stationed_at_village(
+        pool: &PgPool,
+        village_id: Uuid,
+    ) -> AppResult<Vec<ArmyResponse>> {
+        let armies = ArmyRepository::find_stationed_at_village(pool, village_id).await?;
+        Ok(armies.into_iter().map(|a| a.into()).collect())
+    }
+
+    /// Get support troops sent by player to other villages
+    pub async fn get_support_sent(
+        pool: &PgPool,
+        player_id: Uuid,
+    ) -> AppResult<Vec<ArmyResponse>> {
+        let armies = ArmyRepository::find_support_sent_by_player(pool, player_id).await?;
+        Ok(armies.into_iter().map(|a| a.into()).collect())
+    }
+
+    /// Recall stationed support troops back to home village
+    pub async fn recall_support(
+        pool: &PgPool,
+        army_id: Uuid,
+        player_id: Uuid,
+    ) -> AppResult<ArmyResponse> {
+        // Get the army
+        let army = ArmyRepository::find_by_id(pool, army_id)
+            .await?
+            .ok_or_else(|| AppError::NotFound("Army not found".into()))?;
+
+        // Verify ownership
+        if army.player_id != player_id {
+            return Err(AppError::Forbidden);
+        }
+
+        // Must be stationed
+        if !army.is_stationed {
+            return Err(AppError::BadRequest("Army is not stationed".into()));
+        }
+
+        // Calculate return travel time
+        let definitions = TroopRepository::get_all_definitions(pool).await?;
+        let from_village = VillageRepository::find_by_id(pool, army.from_village_id)
+            .await?
+            .ok_or_else(|| AppError::NotFound("Home village not found".into()))?;
+
+        let distance =
+            Self::calculate_distance(army.to_x, army.to_y, from_village.x, from_village.y);
+        let travel_duration = Self::calculate_travel_time(distance, &army.troops.0, &definitions);
+        let returns_at = Utc::now() + travel_duration;
+
+        // Start recall
+        let updated = ArmyRepository::start_recall(pool, army_id, returns_at).await?;
+
+        info!(
+            "Support army {} recalled, returning to village {} at {}",
+            army_id, army.from_village_id, returns_at
+        );
+
+        Ok(updated.into())
     }
 }

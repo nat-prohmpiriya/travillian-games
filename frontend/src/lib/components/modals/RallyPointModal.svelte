@@ -172,12 +172,12 @@
         }
     }
 
-    // Mission options (MVP: Raid, Attack, and Scout)
+    // Mission options (Raid, Attack, Scout, and Support)
     const missionOptions: { type: MissionType; enabled: boolean }[] = [
         { type: 'raid', enabled: true },
         { type: 'attack', enabled: true },
         { type: 'scout', enabled: true },
-        { type: 'support', enabled: false },
+        { type: 'support', enabled: true },
     ];
 </script>
 

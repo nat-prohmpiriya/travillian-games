@@ -17,6 +17,8 @@ pub fn routes(state: AppState) -> Router<AppState> {
         .nest("/troops", troop_routes(state.clone()))
         .nest("/reports", report_routes(state.clone()))
         .nest("/scout-reports", scout_report_routes(state.clone()))
+        .nest("/armies", army_routes(state.clone()))
+        .nest("/support-sent", support_routes(state.clone()))
         // Public routes (no auth required)
         .merge(public_routes())
 }
@@ -57,6 +59,7 @@ fn village_routes(state: AppState) -> Router<AppState> {
         .route("/{village_id}/armies", post(army::send_army))
         .route("/{village_id}/armies/outgoing", get(army::list_outgoing))
         .route("/{village_id}/armies/incoming", get(army::list_incoming))
+        .route("/{village_id}/stationed", get(army::list_stationed))
         .route_layer(middleware::from_fn_with_state(state, auth_middleware))
 }
 
@@ -86,5 +89,17 @@ fn scout_report_routes(state: AppState) -> Router<AppState> {
         .route("/", get(army::list_scout_reports))
         .route("/{report_id}", get(army::get_scout_report))
         .route("/{report_id}/read", post(army::mark_scout_report_read))
+        .route_layer(middleware::from_fn_with_state(state, auth_middleware))
+}
+
+fn army_routes(state: AppState) -> Router<AppState> {
+    Router::new()
+        .route("/{army_id}/recall", post(army::recall_support))
+        .route_layer(middleware::from_fn_with_state(state, auth_middleware))
+}
+
+fn support_routes(state: AppState) -> Router<AppState> {
+    Router::new()
+        .route("/", get(army::list_support_sent))
         .route_layer(middleware::from_fn_with_state(state, auth_middleware))
 }

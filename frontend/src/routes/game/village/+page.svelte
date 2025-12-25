@@ -9,6 +9,7 @@
   import { villageStore, getBuildingBySlot, type Building, type BuildingType } from '$lib/stores/village';
   import { goto } from '$app/navigation';
   import ArmyMovementPanel from '$lib/components/game/ArmyMovementPanel.svelte';
+  import StationedTroopsPanel from '$lib/components/game/StationedTroopsPanel.svelte';
 
   type ViewMode = 'village' | 'resources';
 
@@ -394,6 +395,9 @@
 
         <!-- Army Movements -->
         <ArmyMovementPanel villageId={currentVillage.id} />
+
+        <!-- Support Troops -->
+        <StationedTroopsPanel villageId={currentVillage.id} />
 
         <!-- Quick Actions -->
         <Card class="p-4">

@@ -71,6 +71,7 @@ pub struct Army {
     pub arrives_at: DateTime<Utc>,
     pub returns_at: Option<DateTime<Utc>>,
     pub is_returning: bool,
+    pub is_stationed: bool,
     pub battle_report_id: Option<Uuid>,
     pub created_at: DateTime<Utc>,
 }
@@ -132,6 +133,7 @@ pub struct SendArmyRequest {
 #[derive(Debug, Clone, Serialize)]
 pub struct ArmyResponse {
     pub id: Uuid,
+    pub player_id: Uuid,
     pub from_village_id: Uuid,
     pub to_x: i32,
     pub to_y: i32,
@@ -143,12 +145,14 @@ pub struct ArmyResponse {
     pub arrives_at: DateTime<Utc>,
     pub returns_at: Option<DateTime<Utc>>,
     pub is_returning: bool,
+    pub is_stationed: bool,
 }
 
 impl From<Army> for ArmyResponse {
     fn from(a: Army) -> Self {
         Self {
             id: a.id,
+            player_id: a.player_id,
             from_village_id: a.from_village_id,
             to_x: a.to_x,
             to_y: a.to_y,
@@ -160,6 +164,7 @@ impl From<Army> for ArmyResponse {
             arrives_at: a.arrives_at,
             returns_at: a.returns_at,
             is_returning: a.is_returning,
+            is_stationed: a.is_stationed,
         }
     }
 }

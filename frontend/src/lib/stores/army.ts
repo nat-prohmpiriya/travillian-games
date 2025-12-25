@@ -17,6 +17,7 @@ export type TroopCounts = Partial<Record<TroopType, number>>;
 
 export interface Army {
     id: string;
+    player_id: string;
     from_village_id: string;
     to_x: number;
     to_y: number;
@@ -28,6 +29,7 @@ export interface Army {
     arrives_at: string;
     returns_at: string | null;
     is_returning: boolean;
+    is_stationed: boolean;
 }
 
 export interface BattleReport {
@@ -75,6 +77,8 @@ export interface SendArmyRequest {
 interface ArmyState {
     outgoingArmies: Army[];
     incomingArmies: Army[];
+    stationedTroops: Army[];
+    supportSent: Army[];
     reports: BattleReport[];
     scoutReports: ScoutReport[];
     unreadCount: number;
@@ -86,6 +90,8 @@ function createArmyStore() {
     const { subscribe, set, update } = writable<ArmyState>({
         outgoingArmies: [],
         incomingArmies: [],
+        stationedTroops: [],
+        supportSent: [],
         reports: [],
         scoutReports: [],
         unreadCount: 0,
@@ -292,6 +298,88 @@ function createArmyStore() {
             }
         },
 
+        // ==================== Stationed/Support Troops ====================
+
+        // Load troops stationed at a village (support from allies)
+        loadStationed: async (villageId: string) => {
+            update(state => ({ ...state, loading: true, error: null }));
+            try {
+                const armies = await api.get<Army[]>(
+                    `/api/villages/${villageId}/stationed`
+                );
+                update(state => ({
+                    ...state,
+                    stationedTroops: armies,
+                    loading: false,
+                }));
+                return armies;
+            } catch (error: any) {
+                const message = error.message || 'Failed to load stationed troops';
+                update(state => ({
+                    ...state,
+                    loading: false,
+                    error: message,
+                }));
+                throw error;
+            }
+        },
+
+        // Load support troops sent to other villages
+        loadSupportSent: async () => {
+            update(state => ({ ...state, loading: true, error: null }));
+            try {
+                const armies = await api.get<Army[]>('/api/support-sent');
+                update(state => ({
+                    ...state,
+                    supportSent: armies,
+                    loading: false,
+                }));
+                return armies;
+            } catch (error: any) {
+                const message = error.message || 'Failed to load support sent';
+                update(state => ({
+                    ...state,
+                    loading: false,
+                    error: message,
+                }));
+                throw error;
+            }
+        },
+
+        // Recall stationed support troops
+        recallSupport: async (armyId: string) => {
+            update(state => ({ ...state, loading: true, error: null }));
+            try {
+                const army = await api.post<Army>(
+                    `/api/armies/${armyId}/recall`,
+                    {}
+                );
+
+                // Remove from supportSent and add to outgoingArmies
+                update(state => ({
+                    ...state,
+                    supportSent: state.supportSent.filter(a => a.id !== armyId),
+                    outgoingArmies: [...state.outgoingArmies, army],
+                    loading: false,
+                }));
+
+                toast.success('Troops Recalled', {
+                    description: 'Support troops are returning home'
+                });
+
+                return army;
+            } catch (error: any) {
+                const message = error.message || 'Failed to recall troops';
+                update(state => ({
+                    ...state,
+                    loading: false,
+                    error: message,
+                }));
+                toast.error('Recall Failed', { description: message });
+                throw error;
+            }
+        },
+
         // Clear error
         clearError: () => {
             update(state => ({ ...state, error: null }));
@@ -302,6 +390,8 @@ function createArmyStore() {
             set({
                 outgoingArmies: [],
                 incomingArmies: [],
+                stationedTroops: [],
+                supportSent: [],
                 reports: [],
                 scoutReports: [],
                 unreadCount: 0,

@@ -15,7 +15,7 @@ impl ArmyRepository {
             r#"
             SELECT id, player_id, from_village_id, to_x, to_y, to_village_id,
                    mission, troops, resources, departed_at, arrives_at,
-                   returns_at, is_returning, battle_report_id, created_at
+                   returns_at, is_returning, is_stationed, battle_report_id, created_at
             FROM armies
             WHERE id = $1
             "#,
@@ -32,7 +32,7 @@ impl ArmyRepository {
             r#"
             SELECT id, player_id, from_village_id, to_x, to_y, to_village_id,
                    mission, troops, resources, departed_at, arrives_at,
-                   returns_at, is_returning, battle_report_id, created_at
+                   returns_at, is_returning, is_stationed, battle_report_id, created_at
             FROM armies
             WHERE player_id = $1
             ORDER BY arrives_at ASC
@@ -50,9 +50,9 @@ impl ArmyRepository {
             r#"
             SELECT id, player_id, from_village_id, to_x, to_y, to_village_id,
                    mission, troops, resources, departed_at, arrives_at,
-                   returns_at, is_returning, battle_report_id, created_at
+                   returns_at, is_returning, is_stationed, battle_report_id, created_at
             FROM armies
-            WHERE from_village_id = $1
+            WHERE from_village_id = $1 AND is_stationed = FALSE
             ORDER BY arrives_at ASC
             "#,
         )
@@ -68,9 +68,9 @@ impl ArmyRepository {
             r#"
             SELECT id, player_id, from_village_id, to_x, to_y, to_village_id,
                    mission, troops, resources, departed_at, arrives_at,
-                   returns_at, is_returning, battle_report_id, created_at
+                   returns_at, is_returning, is_stationed, battle_report_id, created_at
             FROM armies
-            WHERE to_village_id = $1 AND is_returning = FALSE
+            WHERE to_village_id = $1 AND is_returning = FALSE AND is_stationed = FALSE
             ORDER BY arrives_at ASC
             "#,
         )
@@ -102,7 +102,7 @@ impl ArmyRepository {
             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
             RETURNING id, player_id, from_village_id, to_x, to_y, to_village_id,
                       mission, troops, resources, departed_at, arrives_at,
-                      returns_at, is_returning, battle_report_id, created_at
+                      returns_at, is_returning, is_stationed, battle_report_id, created_at
             "#,
         )
         .bind(player_id)
@@ -141,7 +141,7 @@ impl ArmyRepository {
             WHERE id = $1
             RETURNING id, player_id, from_village_id, to_x, to_y, to_village_id,
                       mission, troops, resources, departed_at, arrives_at,
-                      returns_at, is_returning, battle_report_id, created_at
+                      returns_at, is_returning, is_stationed, battle_report_id, created_at
             "#,
         )
         .bind(id)
@@ -169,15 +169,128 @@ impl ArmyRepository {
             r#"
             SELECT id, player_id, from_village_id, to_x, to_y, to_village_id,
                    mission, troops, resources, departed_at, arrives_at,
-                   returns_at, is_returning, battle_report_id, created_at
+                   returns_at, is_returning, is_stationed, battle_report_id, created_at
             FROM armies
-            WHERE arrives_at <= NOW()
+            WHERE arrives_at <= NOW() AND is_stationed = FALSE
             "#,
         )
         .fetch_all(pool)
         .await?;
 
         Ok(armies)
+    }
+
+    // ==================== Stationed Troops (Support) ====================
+
+    /// Mark army as stationed at target village
+    pub async fn set_stationed(pool: &PgPool, id: Uuid) -> AppResult<Army> {
+        let army = sqlx::query_as::<_, Army>(
+            r#"
+            UPDATE armies
+            SET is_stationed = TRUE
+            WHERE id = $1
+            RETURNING id, player_id, from_village_id, to_x, to_y, to_village_id,
+                      mission, troops, resources, departed_at, arrives_at,
+                      returns_at, is_returning, is_stationed, battle_report_id, created_at
+            "#,
+        )
+        .bind(id)
+        .fetch_one(pool)
+        .await?;
+
+        Ok(army)
+    }
+
+    /// Find all support troops stationed at a village
+    pub async fn find_stationed_at_village(pool: &PgPool, village_id: Uuid) -> AppResult<Vec<Army>> {
+        let armies = sqlx::query_as::<_, Army>(
+            r#"
+            SELECT id, player_id, from_village_id, to_x, to_y, to_village_id,
+                   mission, troops, resources, departed_at, arrives_at,
+                   returns_at, is_returning, is_stationed, battle_report_id, created_at
+            FROM armies
+            WHERE to_village_id = $1 AND is_stationed = TRUE
+            ORDER BY arrives_at ASC
+            "#,
+        )
+        .bind(village_id)
+        .fetch_all(pool)
+        .await?;
+
+        Ok(armies)
+    }
+
+    /// Find support sent by a player to other villages
+    pub async fn find_support_sent_by_player(pool: &PgPool, player_id: Uuid) -> AppResult<Vec<Army>> {
+        let armies = sqlx::query_as::<_, Army>(
+            r#"
+            SELECT id, player_id, from_village_id, to_x, to_y, to_village_id,
+                   mission, troops, resources, departed_at, arrives_at,
+                   returns_at, is_returning, is_stationed, battle_report_id, created_at
+            FROM armies
+            WHERE player_id = $1 AND is_stationed = TRUE
+            ORDER BY arrives_at ASC
+            "#,
+        )
+        .bind(player_id)
+        .fetch_all(pool)
+        .await?;
+
+        Ok(armies)
+    }
+
+    /// Start recall: set army as returning from stationed position
+    pub async fn start_recall(
+        pool: &PgPool,
+        id: Uuid,
+        returns_at: DateTime<Utc>,
+    ) -> AppResult<Army> {
+        let army = sqlx::query_as::<_, Army>(
+            r#"
+            UPDATE armies
+            SET is_stationed = FALSE,
+                is_returning = TRUE,
+                arrives_at = $2
+            WHERE id = $1
+            RETURNING id, player_id, from_village_id, to_x, to_y, to_village_id,
+                      mission, troops, resources, departed_at, arrives_at,
+                      returns_at, is_returning, is_stationed, battle_report_id, created_at
+            "#,
+        )
+        .bind(id)
+        .bind(returns_at)
+        .fetch_one(pool)
+        .await?;
+
+        Ok(army)
+    }
+
+    /// Update stationed troops after battle (reduce troops)
+    pub async fn update_stationed_troops(
+        pool: &PgPool,
+        id: Uuid,
+        surviving_troops: &ArmyTroops,
+    ) -> AppResult<Option<()>> {
+        // If no survivors, delete the army
+        let total: i32 = surviving_troops.values().sum();
+        if total <= 0 {
+            Self::delete(pool, id).await?;
+            return Ok(None);
+        }
+
+        sqlx::query(
+            r#"
+            UPDATE armies
+            SET troops = $2
+            WHERE id = $1
+            "#,
+        )
+        .bind(id)
+        .bind(sqlx::types::Json(surviving_troops))
+        .execute(pool)
+        .await?;
+
+        Ok(Some(()))
     }
 
     // ==================== Battle Reports ====================

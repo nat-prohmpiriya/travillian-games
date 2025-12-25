@@ -234,3 +234,60 @@ pub async fn mark_scout_report_read(
         "message": "Scout report marked as read"
     })))
 }
+
+// ==================== Support/Stationed Troops ====================
+
+// GET /api/villages/:village_id/stationed - Get troops stationed at a village
+pub async fn list_stationed(
+    State(state): State<AppState>,
+    Extension(auth_user): Extension<AuthenticatedUser>,
+    Path(village_id): Path<Uuid>,
+) -> AppResult<Json<Vec<ArmyResponse>>> {
+    let user = UserRepository::find_by_firebase_uid(&state.db, &auth_user.firebase_uid)
+        .await?
+        .ok_or(AppError::Unauthorized)?;
+
+    let village = VillageRepository::find_by_id(&state.db, village_id)
+        .await?
+        .ok_or_else(|| AppError::NotFound("Village not found".to_string()))?;
+
+    // Only village owner can see stationed troops
+    if village.user_id != user.id {
+        return Err(AppError::Forbidden);
+    }
+
+    let armies = ArmyService::get_stationed_at_village(&state.db, village_id).await?;
+
+    Ok(Json(armies))
+}
+
+// GET /api/support-sent - Get support troops sent by player to other villages
+pub async fn list_support_sent(
+    State(state): State<AppState>,
+    Extension(auth_user): Extension<AuthenticatedUser>,
+) -> AppResult<Json<Vec<ArmyResponse>>> {
+    let user = UserRepository::find_by_firebase_uid(&state.db, &auth_user.firebase_uid)
+        .await?
+        .ok_or(AppError::Unauthorized)?;
+
+    let armies = ArmyService::get_support_sent(&state.db, user.id).await?;
+
+    Ok(Json(armies))
+}
+
+// POST /api/armies/:army_id/recall - Recall stationed support troops
+pub async fn recall_support(
+    State(state): State<AppState>,
+    Extension(auth_user): Extension<AuthenticatedUser>,
+    Path(army_id): Path<Uuid>,
+) -> AppResult<Json<ArmyResponse>> {
+    let user = UserRepository::find_by_firebase_uid(&state.db, &auth_user.firebase_uid)
+        .await?
+        .ok_or(AppError::Unauthorized)?;
+
+    let response = ArmyService::recall_support(&state.db, army_id, user.id).await?;
+
+    info!("Support army {} recalled by player {}", army_id, user.id);
+
+    Ok(Json(response))
+}
