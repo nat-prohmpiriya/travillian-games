@@ -56,6 +56,7 @@ hex = "0.4"
 # Utilities
 async-trait = "0.1"
 rust_decimal = { version = "1", features = ["serde"] }
+rand = "0.8"
 
 [dev-dependencies]
 tokio-test = "0.4"

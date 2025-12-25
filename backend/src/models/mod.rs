@@ -1,6 +1,7 @@
 pub mod alliance;
 pub mod army;
 pub mod building;
+pub mod hero;
 pub mod message;
 pub mod shop;
 pub mod troop;

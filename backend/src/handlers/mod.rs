@@ -2,6 +2,7 @@ mod alliance;
 mod army;
 mod auth;
 mod building;
+mod hero;
 mod message;
 mod shop;
 mod troop;
@@ -28,6 +29,7 @@ pub fn routes(state: AppState) -> Router<AppState> {
         .nest("/conversations", conversation_routes(state.clone()))
         .nest("/alliance-messages", alliance_message_routes(state.clone()))
         .nest("/shop", shop_routes(state.clone()))
+        .nest("/heroes", hero_routes(state.clone()))
         // Public routes (no auth required)
         .merge(public_routes())
 }
@@ -182,5 +184,31 @@ fn shop_routes(state: AppState) -> Router<AppState> {
         .route("/features/npc-merchant", post(shop::use_npc_merchant))
         .route("/features/production-bonus", post(shop::use_production_bonus))
         .route("/features/book-of-wisdom", post(shop::use_book_of_wisdom))
+        .route_layer(middleware::from_fn_with_state(state, auth_middleware))
+}
+
+fn hero_routes(state: AppState) -> Router<AppState> {
+    Router::new()
+        // Hero CRUD
+        .route("/", get(hero::list_heroes))
+        .route("/", post(hero::create_hero))
+        .route("/{id}", get(hero::get_hero))
+        .route("/{id}/home", put(hero::change_home_village))
+        .route("/{id}/attributes", put(hero::assign_attributes))
+        // Hero Slots
+        .route("/slots/buy", post(hero::buy_hero_slot))
+        // Inventory
+        .route("/{id}/inventory", get(hero::get_inventory))
+        .route("/{id}/equip", post(hero::equip_item))
+        .route("/{id}/unequip", post(hero::unequip_item))
+        .route("/{id}/use-item", post(hero::use_item))
+        .route("/{hero_id}/items/{item_id}", delete(hero::sell_item))
+        // Adventures
+        .route("/adventures/available", get(hero::get_available_adventures))
+        .route("/{id}/adventures", post(hero::start_adventure))
+        .route("/{id}/adventures/active", get(hero::get_active_adventure))
+        // Revive
+        .route("/{id}/revive-info", get(hero::get_revive_info))
+        .route("/{id}/revive", post(hero::revive_hero))
         .route_layer(middleware::from_fn_with_state(state, auth_middleware))
 }

@@ -2,6 +2,7 @@ pub mod alliance_service;
 pub mod army_service;
 pub mod background_jobs;
 pub mod building_service;
+pub mod hero_service;
 pub mod message_service;
 pub mod resource_service;
 pub mod shop_service;

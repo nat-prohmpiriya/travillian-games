@@ -44,6 +44,7 @@ pub enum GoldFeature {
     Artwork,
     Ointment,
     PlusSubscription,
+    HeroSlot,
 }
 
 // ==================== Database Models ====================
