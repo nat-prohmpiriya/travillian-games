@@ -63,7 +63,7 @@ impl ArmyService {
 
         // Validate ownership
         if from_village.user_id != player_id {
-            return Err(AppError::Forbidden);
+            return Err(AppError::Forbidden("Access denied".into()));
         }
 
         // Validate troops are available
@@ -1224,7 +1224,7 @@ impl ArmyService {
         let is_defender = report.defender_player_id == Some(player_id);
 
         if !is_attacker && !is_defender {
-            return Err(AppError::Forbidden);
+            return Err(AppError::Forbidden("Access denied".into()));
         }
 
         ArmyRepository::mark_report_read(pool, report_id, is_attacker).await
@@ -1259,7 +1259,7 @@ impl ArmyService {
         let is_defender = report.defender_player_id == Some(player_id);
 
         if !is_attacker && !is_defender {
-            return Err(AppError::Forbidden);
+            return Err(AppError::Forbidden("Access denied".into()));
         }
 
         ArmyRepository::mark_scout_report_read(pool, report_id, is_attacker).await
@@ -1305,7 +1305,7 @@ impl ArmyService {
 
         // Verify ownership
         if army.player_id != player_id {
-            return Err(AppError::Forbidden);
+            return Err(AppError::Forbidden("Access denied".into()));
         }
 
         // Must be stationed

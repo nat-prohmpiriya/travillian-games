@@ -31,7 +31,7 @@ pub async fn list_buildings(
         .ok_or_else(|| AppError::NotFound("Village not found".to_string()))?;
 
     if village.user_id != user.id {
-        return Err(AppError::Forbidden);
+        return Err(AppError::Forbidden("Access denied".into()));
     }
 
     let buildings = BuildingRepository::find_by_village_id(&state.db, village_id).await?;
@@ -66,7 +66,7 @@ pub async fn build(
         .ok_or_else(|| AppError::NotFound("Village not found".to_string()))?;
 
     if village.user_id != user.id {
-        return Err(AppError::Forbidden);
+        return Err(AppError::Forbidden("Access denied".into()));
     }
 
     // Check if slot is empty
@@ -147,7 +147,7 @@ pub async fn upgrade(
         .ok_or_else(|| AppError::NotFound("Village not found".to_string()))?;
 
     if village.user_id != user.id {
-        return Err(AppError::Forbidden);
+        return Err(AppError::Forbidden("Access denied".into()));
     }
 
     let building = BuildingRepository::find_by_village_and_slot(&state.db, village_id, slot)
@@ -215,7 +215,7 @@ pub async fn demolish(
         .ok_or_else(|| AppError::NotFound("Village not found".to_string()))?;
 
     if village.user_id != user.id {
-        return Err(AppError::Forbidden);
+        return Err(AppError::Forbidden("Access denied".into()));
     }
 
     let building = BuildingRepository::find_by_village_and_slot(&state.db, village_id, slot)
@@ -256,7 +256,7 @@ pub async fn get_build_queue(
         .ok_or_else(|| AppError::NotFound("Village not found".to_string()))?;
 
     if village.user_id != user.id {
-        return Err(AppError::Forbidden);
+        return Err(AppError::Forbidden("Access denied".into()));
     }
 
     let buildings = BuildingRepository::find_upgrading_by_village(&state.db, village_id).await?;

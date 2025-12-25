@@ -46,7 +46,7 @@ pub async fn get_village(
 
     // Check ownership
     if village.user_id != user.id {
-        return Err(AppError::Forbidden);
+        return Err(AppError::Forbidden("Access denied".into()));
     }
 
     // Update resources based on time elapsed before returning
@@ -133,7 +133,7 @@ pub async fn update_village(
         .ok_or_else(|| AppError::NotFound("Village not found".to_string()))?;
 
     if village.user_id != user.id {
-        return Err(AppError::Forbidden);
+        return Err(AppError::Forbidden("Access denied".into()));
     }
 
     let update = UpdateVillage { name: body.name };

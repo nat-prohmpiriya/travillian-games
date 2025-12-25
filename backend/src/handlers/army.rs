@@ -30,7 +30,7 @@ pub async fn send_army(
         .ok_or_else(|| AppError::NotFound("Village not found".to_string()))?;
 
     if village.user_id != user.id {
-        return Err(AppError::Forbidden);
+        return Err(AppError::Forbidden("Access denied".into()));
     }
 
     let response = ArmyService::send_army(&state.db, user.id, village_id, body).await?;
@@ -58,7 +58,7 @@ pub async fn list_outgoing(
         .ok_or_else(|| AppError::NotFound("Village not found".to_string()))?;
 
     if village.user_id != user.id {
-        return Err(AppError::Forbidden);
+        return Err(AppError::Forbidden("Access denied".into()));
     }
 
     let armies = ArmyService::get_outgoing_armies(&state.db, village_id).await?;
@@ -81,7 +81,7 @@ pub async fn list_incoming(
         .ok_or_else(|| AppError::NotFound("Village not found".to_string()))?;
 
     if village.user_id != user.id {
-        return Err(AppError::Forbidden);
+        return Err(AppError::Forbidden("Access denied".into()));
     }
 
     let armies = ArmyService::get_incoming_armies(&state.db, village_id).await?;
@@ -130,7 +130,7 @@ pub async fn get_report(
     let is_defender = report.defender_player_id == Some(user.id);
 
     if !is_attacker && !is_defender {
-        return Err(AppError::Forbidden);
+        return Err(AppError::Forbidden("Access denied".into()));
     }
 
     Ok(Json(report.to_response(is_attacker)))
@@ -212,7 +212,7 @@ pub async fn get_scout_report(
     let is_defender = report.defender_player_id == Some(user.id);
 
     if !is_attacker && !is_defender {
-        return Err(AppError::Forbidden);
+        return Err(AppError::Forbidden("Access denied".into()));
     }
 
     Ok(Json(report.to_response(is_attacker)))
@@ -253,7 +253,7 @@ pub async fn list_stationed(
 
     // Only village owner can see stationed troops
     if village.user_id != user.id {
-        return Err(AppError::Forbidden);
+        return Err(AppError::Forbidden("Access denied".into()));
     }
 
     let armies = ArmyService::get_stationed_at_village(&state.db, village_id).await?;

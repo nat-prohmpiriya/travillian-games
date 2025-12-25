@@ -40,7 +40,7 @@ pub async fn list_troops(
         .ok_or_else(|| AppError::NotFound("Village not found".to_string()))?;
 
     if village.user_id != user.id {
-        return Err(AppError::Forbidden);
+        return Err(AppError::Forbidden("Access denied".into()));
     }
 
     let troops = TroopService::get_village_troops(&state.db, village_id).await?;
@@ -63,7 +63,7 @@ pub async fn get_training_queue(
         .ok_or_else(|| AppError::NotFound("Village not found".to_string()))?;
 
     if village.user_id != user.id {
-        return Err(AppError::Forbidden);
+        return Err(AppError::Forbidden("Access denied".into()));
     }
 
     let queue = TroopService::get_training_queue(&state.db, village_id).await?;
@@ -87,7 +87,7 @@ pub async fn train_troops(
         .ok_or_else(|| AppError::NotFound("Village not found".to_string()))?;
 
     if village.user_id != user.id {
-        return Err(AppError::Forbidden);
+        return Err(AppError::Forbidden("Access denied".into()));
     }
 
     let response = TroopService::train_troops(&state.db, village_id, body.troop_type, body.count).await?;
@@ -115,7 +115,7 @@ pub async fn cancel_training(
         .ok_or_else(|| AppError::NotFound("Village not found".to_string()))?;
 
     if village.user_id != user.id {
-        return Err(AppError::Forbidden);
+        return Err(AppError::Forbidden("Access denied".into()));
     }
 
     TroopService::cancel_training(&state.db, village_id, queue_id).await?;
